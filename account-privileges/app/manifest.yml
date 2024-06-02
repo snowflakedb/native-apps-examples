@@ -1,0 +1,49 @@
+# For more information on creating manifest, go to https://docs.snowflake.com/en/developer-guide/native-apps/creating-manifest
+manifest_version: 1
+
+version:
+  name: Dev
+  label: "Dev Version"
+  comment: "Default version used for development. Override for actual deployment."
+
+artifacts:
+  setup_script: setup_script.sql
+  default_streamlit: core.ui
+  extension_code: true 
+
+references:
+  - table_reference:
+      label: "Table Reference"
+      description: "A table in the consumer account that exists outside the APPLICATION object."
+      privileges:
+        - INSERT
+      object_type: TABLE
+      multi_valued: false
+      register_callback: config.register_single_reference
+  
+  - view_reference:
+      label: "View Reference"
+      description: "A view in the consumer account that exists outside the APPLICATION object."
+      privileges:
+        - SELECT
+      object_type: VIEW
+      multi_valued: false
+      register_callback: config.register_single_reference
+  
+  - procedure_reference:
+      label: "Procedure Reference"
+      description: "A procedure in the consumer account that exists outside the APPLICATION object."
+      privileges:
+        - USAGE
+      object_type: PROCEDURE
+      multi_valued: false
+      register_callback: config.register_single_reference
+  
+  - function_reference:
+      label: "Function Reference"
+      description: "A function in the consumer account that exists outside the APPLICATION object."
+      privileges:
+        - USAGE
+      object_type: FUNCTION
+      multi_valued: false
+      register_callback: config.register_single_reference

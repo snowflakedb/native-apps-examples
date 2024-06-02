@@ -1,0 +1,17 @@
+manifest_version: 1
+artifacts:
+  setup_script: setup_script.sql
+  default_streamlit: ui."Dashboard"
+
+references:
+  - tabletouse:
+      label: "Table that contains data to be keyed"
+      description: "Table that has IP address column and a column to write into"
+      privileges:
+        - SELECT
+        - INSERT
+        - UPDATE
+        - REFERENCES
+      object_type: TABLE
+      multi_valued: false
+      register_callback: config_code.register_single_callback

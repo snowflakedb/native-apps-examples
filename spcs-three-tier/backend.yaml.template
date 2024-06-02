@@ -1,0 +1,7 @@
+spec:
+  containers:
+    - name: eap-backend
+      image: <<REPOSITORY>>/eap_backend
+  endpoints:
+    - name: eap-backend
+      port: 8081

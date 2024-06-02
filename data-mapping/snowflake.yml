@@ -1,0 +1,10 @@
+definition_version: 1
+native_app:
+  name: data_mapping_app
+  source_stage: app_src.stage
+  artifacts:
+    - src: app/*
+      dest: ./
+  package:
+    scripts:
+      - scripts/setup-package-script.sql

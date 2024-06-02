@@ -1,0 +1,6 @@
+snowflake-connector-python
+snowflake-snowpark-python
+pandas
+numpy
+datetime
+flask

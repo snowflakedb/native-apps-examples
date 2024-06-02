@@ -1,0 +1,78 @@
+# For more information on creating manifest, go to https://docs.snowflake.com/en/developer-guide/native-apps/creating-manifest
+manifest_version: 1
+
+version:
+  name: Dev
+  label: "Dev Version"
+  comment: "Default version used for development. Override for actual deployment."
+
+artifacts:
+  setup_script: setup_script.sql
+  readme: README.md
+  default_streamlit: core.dashboard
+  extension_code: true 
+  
+references:
+  - consumer_table:
+      label: "Consumer table"
+      description: "A table in the consumer account that exists outside the APPLICATION object."
+      privileges:
+        - SELECT
+        - INSERT
+        - UPDATE
+        - DELETE
+        - TRUNCATE
+        - REFERENCES
+      object_type: TABLE
+      multi_valued: false
+      register_callback: config.register_single_reference
+  - consumer_view:
+      label: "Consumer view"
+      description: "A view in the consumer account that exists outside the APPLICATION object."
+      privileges:
+        - SELECT
+        - REFERENCES
+      object_type: VIEW
+      multi_valued: false
+      register_callback: config.register_single_reference
+  - consumer_external_table:
+      label: "Consumer external table"
+      description: "An external table in the consumer account that exists outside the APPLICATION object."
+      privileges:
+        - SELECT
+        - REFERENCES
+      object_type: EXTERNAL TABLE
+      multi_valued: false
+      register_callback: config.register_single_reference
+  - consumer_function:
+      label: "Consumer function"
+      description: "A function in the consumer account that exists outside the APPLICATION object."
+      privileges:
+        - USAGE
+      object_type: FUNCTION
+      multi_valued: false
+      register_callback: config.register_single_reference
+  - consumer_procedure:
+      label: "Consumer procedure"
+      description: "A procedure in the consumer account that exists outside the APPLICATION object."
+      privileges:
+        - USAGE
+      object_type: PROCEDURE
+      multi_valued: false
+      register_callback: config.register_single_reference
+  - consumer_api:
+      label: "Consumer API"
+      description: "An API integration in the consumer account that exists outside the APPLICATION object."
+      privileges:
+        - USAGE
+      object_type: API INTEGRATION
+      multi_valued: false
+      register_callback: config.register_single_reference
+  - consumer_warehouse:
+      label: "Consumer warehouse"
+      description: "A warehouse in the consumer account WITH MONITOR PRIVILEGES that exists outside the APPLICATION object."
+      privileges:
+        - MONITOR
+      object_type: WAREHOUSE
+      multi_valued: false
+      register_callback: config.register_single_reference

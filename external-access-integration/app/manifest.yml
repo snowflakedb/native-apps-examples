@@ -1,0 +1,22 @@
+# For more information on creating manifest, go to https://docs.snowflake.com/en/developer-guide/native-apps/creating-manifest
+manifest_version: 1
+
+version:
+  name: Dev
+  label: "Dev Version"
+  comment: "Default version used for development. Override for actual deployment."
+
+artifacts:
+  setup_script: setup_script.sql
+  default_streamlit: core.ui
+  extension_code: true
+
+references:
+  - external_access_reference:
+      label: "Coincap Access Integration"
+      description: "This EAI is required to access the api.coincap.io API"
+      privileges:
+        - USAGE
+      object_type: EXTERNAL ACCESS INTEGRATION
+      register_callback: core.register_single_callback
+      configuration_callback: core.get_configuration

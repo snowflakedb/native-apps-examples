@@ -1,0 +1,11 @@
+definition_version: 1
+native_app:
+  name: external_access_integration_app
+  source_stage: app_src.stage
+  artifacts:
+    - src: app/*
+      dest: ./
+    - src: src/module-api/src/coincap.py
+      dest: module-api/coincap.py
+    - src: src/module-ui/src/*
+      dest: streamlit/

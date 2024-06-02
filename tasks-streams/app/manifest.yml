@@ -1,0 +1,26 @@
+# For more information on creating manifest, go to https://docs.snowflake.com/en/developer-guide/native-apps/creating-manifest
+manifest_version: 1
+
+version:
+  name: Dev
+  label: "Dev Version"
+  comment: "Default version used for development. Override for actual deployment."
+
+artifacts:
+  setup_script: setup_script.sql
+  default_streamlit: core.ui
+  extension_code: true 
+
+privileges:
+  - EXECUTE TASK:
+      description: "Permission to execute an internal task inside the app"
+
+references:
+  - warehouse_reference:
+      label: "Warehouse task"
+      description: "Warehouse where the task will be running"
+      privileges:
+        - USAGE
+      object_type: WAREHOUSE
+      multi_valued: false
+      register_callback: core.register_single_callback

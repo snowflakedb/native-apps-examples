@@ -1,0 +1,12 @@
+# This is a project definition file, a required component of the Snowflake Native Apps Project.
+# DO NOT delete this file if you intend to use snowCLI with this project.  
+
+definition_version: 1
+native_app:
+  name: mailorder
+  source_stage: app_src.stage
+  artifacts:
+    - src: app/*
+      dest: ./
+    - src: python/src/*
+      dest: ./python/

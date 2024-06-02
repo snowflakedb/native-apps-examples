@@ -1,0 +1,5 @@
+snowflake.local.yml
+output/
+**/__pycache__/
+.vscode/
+.idea/

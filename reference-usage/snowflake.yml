@@ -1,0 +1,13 @@
+definition_version: 1
+native_app:
+  name: reference_usage_app
+  source_stage: app_src.stage
+  artifacts:
+    - src: app/*
+      dest: ./
+    - src: src/module-ui/src/*
+      dest: streamlit/
+  package:
+    scripts:
+      - scripts/shared-content.sql
+

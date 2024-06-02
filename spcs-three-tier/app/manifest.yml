@@ -1,0 +1,48 @@
+manifest_version: 1
+version:
+  name: V1
+  label: "First Version"
+
+configuration:
+  grant_callback: v1.create_services
+
+artifacts:
+  setup_script: setup.sql
+
+  default_web_endpoint:
+    service: app_public.frontend
+    endpoint: app
+
+  container_services:
+    images:
+      - /spcs_app/napp/img_repo/eap_frontend
+      - /spcs_app/napp/img_repo/eap_backend
+      - /spcs_app/napp/img_repo/eap_router
+
+privileges:
+  - BIND SERVICE ENDPOINT:
+      description: "Ability to create ingress URLs."
+      required_at_setup: true
+  - CREATE COMPUTE POOL:
+      required_at_setup: true
+      description: "Enable appplication to create its own compute pool(s)"
+
+
+references:
+  - ORDERS_TABLE:
+      label: "Orders table"
+      description: "Orders table in TPC-H samples"
+      privileges:
+        - SELECT
+      object_type: VIEW
+      multi_valued: false
+      register_callback: v1.register_single_callback
+  
+  - WIKIPEDIA_EAI:
+      label: "Wikipedia Access Integration"
+      description: "EAI for Egress from NA+SPCS"
+      privileges: [USAGE]
+      object_type: EXTERNAL_ACCESS_INTEGRATION
+      register_callback: v1.register_single_callback
+      configuration_callback: v1.get_configuration
+      required_at_setup: true

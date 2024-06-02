@@ -1,0 +1,15 @@
+manifest_version: 1
+
+artifacts:
+  setup_script: setup.sql
+  default_streamlit: ui.receipts_ui
+  readme: README.md
+
+configuration:
+  log_level: debug
+  trace_level: always
+
+privileges:
+  - CREATE DATABASE:
+      description: "Permission to create MAILORDER_DB database for logging purposes"
+

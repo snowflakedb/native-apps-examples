@@ -1,0 +1,14 @@
+definition_version: 1
+native_app:
+  name: custom_billing_event_app
+  source_stage: app_src.stage
+  artifacts:
+    - src: app/*
+      dest: ./
+    - src: src/module-add/src/main/python/add.py
+      dest: module-add/add.py
+    - src: src/module-billing/src/billing.py
+      dest: module-billing/billing.py
+    - src: src/module-ui/src/*
+      dest: streamlit/
+

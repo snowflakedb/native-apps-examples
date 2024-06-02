@@ -1,0 +1,7 @@
+output/deploy/
+app/backend.yaml
+app/frontend.yaml
+__pycache__
+package_modules
+node_modules
+Makefile

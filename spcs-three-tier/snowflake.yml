@@ -1,0 +1,20 @@
+# This is a project definition file, a required component of the Snowflake Native Apps Project.
+# DO NOT delete this file if you intend to use snowCLI with this project.  
+
+definition_version: 1
+native_app:
+  name: spcs
+  source_stage: napp.app_stage
+  artifacts:
+    - src: app/*
+      dest: ./
+  package:
+    name: spcs_app_pkg
+    role: naspcs_role
+    warehouse: wh_nap
+    scripts:
+      - scripts/setup_shared_content.sql
+  application:
+    name: spcs_app_instance
+    role: nac
+    warehouse: wh_nac
