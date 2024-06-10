@@ -49,6 +49,35 @@ $$;
 
 GRANT USAGE ON PROCEDURE v1.get_configuration(STRING) TO APPLICATION ROLE app_admin;
 
+CREATE OR REPLACE PROCEDURE v1.init()
+RETURNS STRING 
+LANGUAGE SQL
+EXECUTE AS OWNER 
+AS
+$$
+BEGIN
+    CREATE SCHEMA IF NOT EXISTS upgrades;
+    CREATE TABLE IF NOT EXISTS upgrades.version_history
+    (
+        VERSION STRING,
+        ID INT AUTOINCREMENT ORDER
+    );
+
+    GRANT ALL PRIVILEGES ON SCHEMA upgrades TO APPLICATION ROLE app_public;
+    GRANT SELECT ON TABLE upgrades.version_history TO APPLICATION ROLE app_public;
+
+    INSERT INTO upgrades.version_history(version) VALUES ('version 1');
+
+    -- version initializer callback can be used to upgrade services:
+    
+    ALTER SERVICE IF EXISTS app_public.frontend FROM SPEC='frontend.yaml';
+    ALTER SERVICE IF EXISTS app_public.backend FROM SPEC='backend.yaml';
+
+    RETURN 'init complete';
+END $$;
+
+GRANT USAGE ON PROCEDURE v1.init() TO APPLICATION ROLE app_admin;
+
 CREATE OR REPLACE PROCEDURE v1.start_backend(pool_name VARCHAR)
     RETURNS string
     LANGUAGE sql

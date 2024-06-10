@@ -19,6 +19,9 @@ artifacts:
       - /spcs_app/napp/img_repo/eap_backend
       - /spcs_app/napp/img_repo/eap_router
 
+lifecycle_callbacks:
+    version_initializer: v1.init
+
 privileges:
   - BIND SERVICE ENDPOINT:
       description: "Ability to create ingress URLs."
