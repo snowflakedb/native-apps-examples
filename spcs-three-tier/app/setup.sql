@@ -55,24 +55,9 @@ LANGUAGE SQL
 EXECUTE AS OWNER 
 AS
 $$
-BEGIN
-    CREATE SCHEMA IF NOT EXISTS upgrades;
-    CREATE TABLE IF NOT EXISTS upgrades.version_history
-    (
-        VERSION STRING,
-        ID INT AUTOINCREMENT ORDER
-    );
-
-    GRANT ALL PRIVILEGES ON SCHEMA upgrades TO APPLICATION ROLE app_public;
-    GRANT SELECT ON TABLE upgrades.version_history TO APPLICATION ROLE app_public;
-
-    INSERT INTO upgrades.version_history(version) VALUES ('version 1');
-
-    -- version initializer callback can be used to upgrade services:
-    
-    ALTER SERVICE IF EXISTS app_public.frontend FROM SPEC='frontend.yaml';
-    ALTER SERVICE IF EXISTS app_public.backend FROM SPEC='backend.yaml';
-
+BEGIN    
+    ALTER SERVICE IF EXISTS app_public.frontend FROM SPECIFICATION_FILE='frontend.yaml';
+    ALTER SERVICE IF EXISTS app_public.backend FROM SPECIFICATION_FILE='backend.yaml';
     RETURN 'init complete';
 END $$;
 
