@@ -49,6 +49,9 @@ $$;
 
 GRANT USAGE ON PROCEDURE v1.get_configuration(STRING) TO APPLICATION ROLE app_admin;
 
+-- The version initializer callback is executed after a successful installation, upgrade, or downgrade of an application object.
+-- In case the application fails to upgrade, the version initializer of the previous (successful) version will be executed so you 
+-- can clean up application state that may have been modified during the failed upgrade.
 CREATE OR REPLACE PROCEDURE v1.init()
 RETURNS STRING 
 LANGUAGE SQL
