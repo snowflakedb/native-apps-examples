@@ -1,0 +1,12 @@
+definition_version: 1
+native_app:
+  name: snowflake_cortex
+  source_stage: app_src.stage
+  artifacts:
+    - src: app/*
+      dest: ./
+    - src: src/ui/*
+      dest: streamlit/
+  package:
+    scripts:
+      - scripts/shared_content.sql
