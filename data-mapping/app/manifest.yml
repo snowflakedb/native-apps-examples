@@ -1,5 +1,6 @@
 manifest_version: 1
 artifacts:
+  readme: README.md
   setup_script: setup_script.sql
   default_streamlit: ui."Dashboard"
 

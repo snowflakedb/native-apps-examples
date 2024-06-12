@@ -7,4 +7,4 @@ native_app:
       dest: ./
   package:
     scripts:
-      - scripts/setup-package-script.sql
+      - scripts/setup_package_script.sql
