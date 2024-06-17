@@ -34,17 +34,13 @@ jobs:
             environment-file: ${{ matrix.environment-file }}
       - name: Get changes
         id: changed-files
-        run: |
-            if ${{ github.event_name == 'pull_request' }}; then
-              echo "changed_files=$(git diff --name-only -r HEAD^1 HEAD | xargs)" >> $GITHUB_OUTPUT
-            else
-              echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
-            fi
+        uses: jitterbit/get-changed-files@v1
       - name: List changed files
         run: |
-            for file in ${{ steps.changed-files.outputs.changed_files }}; do
-                echo "$(dirname "${file}")"
-            done
+          for changed_file in ${{ steps.changed-files.outputs.all }}; do
+            DIR="$(dirname "${changed_file}")"        
+            echo "Do something with this ${DIR}."
+          done
       - name: Install dependencies
         run: |
               python -m pip install pytest
