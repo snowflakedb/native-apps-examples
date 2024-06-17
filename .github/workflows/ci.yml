@@ -18,8 +18,16 @@ permissions:
   contents: read
 
 jobs:          
-  audit-mailorder:
+  build-mailorder:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - environment-file: mailorder/local_test_env.yml
+    defaults:
+      run:
+        shell: bash -l {0}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.10
@@ -31,12 +39,12 @@ jobs:
         with:
             activate-environment: mailorder-testing
             environment-file: mailorder/local_test_env.yml
-            auto-activate-base: false
-            run: |
-              pip install pytest
+      - name: Install dependencies
+        run: |
+              python -m pip install .
+              python -m pip install pytest
       - name: Run tests
         working-directory: mailorder
         run: |
-          pip install pytest
           pytest
         
