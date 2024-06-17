@@ -18,6 +18,13 @@ permissions:
   contents: read
 
 jobs:
+  setup-conda-env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup conda environment
+        run: |
+          conda init zsh
+          
   audit-mailorder:
     runs-on: ubuntu-latest
     steps:
