@@ -42,7 +42,7 @@ jobs:
         run: |
             for changed_file in ${{ steps.changed-files.outputs.changed_files }}; do
               DIR="$(dirname "${changed_file}")"        
-              echo "{DIR}"
+              echo "${DIR}"
             done
       - name: Setup test environment
         uses: conda-incubator/setup-miniconda@v2
