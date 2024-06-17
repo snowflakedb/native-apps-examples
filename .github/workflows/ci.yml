@@ -17,7 +17,7 @@ permissions:
   contents: read
 
 jobs:
-  audit-mailorder:
+  Audit-Pull-Request:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
