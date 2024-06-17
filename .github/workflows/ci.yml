@@ -7,13 +7,17 @@ on:
   push:
     branches: [ GITHUB_REF ]
   pull_request:
-    branches: [ GITHUB_HEAD_REF ]
+    types:
+      - opened
+      - edited
+      - labeled
+      - unlabeled
 
 permissions:
   contents: read
 
 jobs:
-  build:
+  Audit-Pull-Request:
 
     runs-on: ubuntu-latest
 
