@@ -30,9 +30,10 @@ jobs:
         working-directory: mailorder
         run: |
           conda env update -f local_test_env.yml
+          conda init
           conda activate mailorder-testing
       - name: Run tests
-        working-directory: ./native-apps-examples/mailorder
+        working-directory: mailorder
         run: |
           pytest
         
