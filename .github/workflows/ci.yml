@@ -12,12 +12,13 @@ on:
       - edited
       - labeled
       - unlabeled
+      - synchronize
 
 permissions:
   contents: read
 
 jobs:
-  Audit-Pull-Request:
+  audit-mailorder:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
