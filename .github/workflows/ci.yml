@@ -31,11 +31,8 @@ jobs:
             activate-environment: mailorder-testing
             environment-file: mailorder/local_test_env.yml
             auto-activate-base: true
-      - run: |
-            conda info
-            conda list
       - name: Run tests
         working-directory: mailorder
         run: |
-          pytest
+          python -m pytest
         
