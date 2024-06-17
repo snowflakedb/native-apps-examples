@@ -29,7 +29,7 @@ jobs:
       - name: Setup testing environment
         working-directory: mailorder
         run: |
-          conda init
+          conda init zsh
           conda env update -f local_test_env.yml
           conda activate mailorder-testing
       - name: Run tests
