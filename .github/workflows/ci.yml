@@ -44,7 +44,7 @@ jobs:
           fi
       - name: List changed files
         run: |
-          for changed_file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          for changed_file in ${{ steps.changed-files.outputs.changed_files }}; do
             DIR="$(dirname "${changed_file}")"        
             echo "Do something with this ${DIR}."
           done
