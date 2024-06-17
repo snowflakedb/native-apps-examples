@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: "3.10"
       - name: Setup testing environment
-        working-directory: ./native-apps-examples/mailorder
+        working-directory: mailorder
         run: |
           conda env update -f local_test_env.yml
           conda activate mailorder-testing
