@@ -48,7 +48,6 @@ jobs:
             const { CHANGED_FILES } = process.env;
             const fs = require('fs');
             const path = require('path');
-            const core = require('@actions/core');
 
             function getPytestPaths(dir, callback) 
             {
