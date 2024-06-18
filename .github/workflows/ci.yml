@@ -44,7 +44,7 @@ jobs:
           CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
         with:
           script: |
-            const { CHANGED_FILES } = process.env
+            const { CHANGED_FILES } = process.env;
             const fs = require('fs');
             const path = require('path');
 
@@ -72,8 +72,8 @@ jobs:
             }
 
             const paths = new Set(CHANGED_FILES.split(" ")
-                          .map(path => path.substring(0, path.indexOf("/") + 1))
-                          .filter(path => path.length > 0 && !path.startsWith('.')));
+                          .map(x => x.substring(0, x.indexOf("/") + 1))
+                          .filter(x => x.length > 0 && !x.startsWith('.')));
             
             for (const rootPath of paths) 
             {
