@@ -40,6 +40,7 @@ jobs:
             fi
       - name: Determine tests to run
         uses: actions/github-script@v7
+        id: tests_to_run
         env:
           CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
         with:
@@ -47,6 +48,7 @@ jobs:
             const { CHANGED_FILES } = process.env;
             const fs = require('fs');
             const path = require('path');
+            const core = require('@actions/core');
 
             function getPytestPaths(dir, callback) 
             {
@@ -79,8 +81,8 @@ jobs:
               getPytestPaths(rootPath, x => pytestPaths.add(x))
             }
             
-            console.log(pytestPaths)
-            console.log(paths)
+            core.setOutput('pytestPaths', pytestPaths.join(' '));
+            core.setOutput('pytestArgs', paths.join(' '));
 
       - name: Setup test environment
         uses: conda-incubator/setup-miniconda@v2
