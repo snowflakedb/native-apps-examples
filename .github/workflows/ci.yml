@@ -54,7 +54,6 @@ jobs:
               console.log(files)
               for (const file of files) 
               {
-                console.log(file.name)
                 if (file.isDirectory()) 
                 {
                   getPytestPaths(path.join(dir, file.name), callback);
@@ -77,8 +76,7 @@ jobs:
             
             for (const rootPath of paths) 
             {
-              const files = fs.readdirSync(dir, { withFileTypes: true });
-              console.log(files)  
+              
               //getPytestPaths(rootPath, path => console.log(path))
             }
 
