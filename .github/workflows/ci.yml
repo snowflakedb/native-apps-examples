@@ -46,6 +46,7 @@ jobs:
           script: |
             const { CHANGED_FILES } = process.env
             const files = CHANGED_FILES.split(" ")
+                          .map(x => substring(0, path.indexOf("/")+1))
             console.log(files)
       - name: Setup test environment
         uses: conda-incubator/setup-miniconda@v2
