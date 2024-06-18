@@ -89,6 +89,7 @@ jobs:
             environment-file: ${{ matrix.environment-file }}
       - name: Install dependencies
         run: |
+              printf "[pytest]\npythonpath=${{ steps.tests_to_run.outputs.pytestPaths }}" > pytest.ini
               python -m pip install pytest
       - name: Run tests
         run: |
