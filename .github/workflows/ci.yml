@@ -45,7 +45,8 @@ jobs:
         with:
           script: |
             const { CHANGED_FILES } = process.env
-            console.log(typeof CHANGED_FILES)
+            const files = CHANGED_FILES.split(" ")
+            console.log(files)
       - name: Setup test environment
         uses: conda-incubator/setup-miniconda@v2
         with:
