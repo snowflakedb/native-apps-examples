@@ -69,15 +69,12 @@ jobs:
             }
 
             const paths = new Set(CHANGED_FILES.split(" ")
-                          .map(x => x.substring(0, x.indexOf("/") + 1))
-                          .filter(x => x.length > 0 && !x.startsWith('.')));
+                          .map(path => path.substring(0, path.indexOf("/") + 1))
+                          .filter(x => path.length > 0 && !path.startsWith('.')));
             
             for (const rootPath of paths) 
             {
-                /*for (const path of getPytestPaths(rootPath))
-                {
-                  console.log(path);
-                }*/
+                getPytestPaths(rootPath, path => console.log(path))
             }
 
       - name: Setup test environment
