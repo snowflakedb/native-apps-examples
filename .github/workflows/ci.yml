@@ -48,21 +48,21 @@ jobs:
             const fs = require('fs');
             const path = require('path');
 
-            const getPytestPaths = (directory) => 
+            const getPytestPaths = (dir) => 
             {
-              const files = fs.readdirSync(directory, { withFileTypes: true });
+              const files = fs.readdirSync(dir, { withFileTypes: true });
                 for (const file of files) 
                 {
                   if (file.isDirectory()) 
                   {
-                    yield* readAllFiles(path.join(directory, file.name));
+                    yield* readAllFiles(path.join(dir, file.name));
                   } 
                   else
                   {
                     extension = path.extname(file.name)
                     if (extension == '.py')
                     {
-                      yield directory;
+                      yield dir;
                     }
                   }
                 }
