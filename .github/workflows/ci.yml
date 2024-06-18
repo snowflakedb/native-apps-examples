@@ -59,7 +59,7 @@ jobs:
                 } 
                 else
                 {
-                  extension = path.extname(file.name)
+                  extension = path.extname(file.name);
                   if (extension == '.py')
                   {
                     yield dir;
@@ -70,13 +70,13 @@ jobs:
 
             const paths = new Set(CHANGED_FILES.split(" ")
                           .map(x => x.substring(0, x.indexOf("/") + 1))
-                          .filter(x => x.length > 0 && !x.startsWith('.')))
+                          .filter(x => x.length > 0 && !x.startsWith('.')));
             
             for (const rootPath of paths) 
             {
                 for (const path of getPytestPaths(rootPath))
                 {
-                  console.log(path)
+                  console.log(path);
                 }
             }
 
