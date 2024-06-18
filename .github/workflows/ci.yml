@@ -93,5 +93,11 @@ jobs:
               python -m pip install pytest
       - name: Run tests
         run: |
-          pytest ${{ steps.tests_to_run.outputs.pytestArgs }}
+          args=${{ steps.tests_to_run.outputs.pytestArgs }}
+          if [ -z "${args}" ]; then
+            echo “Nothing to test”
+          else
+            pytest $args
+          fi
+          
         
