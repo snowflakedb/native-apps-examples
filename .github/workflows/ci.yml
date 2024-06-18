@@ -78,6 +78,9 @@ jobs:
             {
               getPytestPaths(rootPath, x => pytestPaths.add(x))
             }
+            
+            console.log(pytestPaths)
+            console.log(paths)
 
       - name: Setup test environment
         uses: conda-incubator/setup-miniconda@v2
