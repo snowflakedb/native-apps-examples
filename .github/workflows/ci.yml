@@ -53,6 +53,7 @@ jobs:
               const files = fs.readdirSync(dir, { withFileTypes: true });
               for (const file of files) 
               {
+                console.log(file.name)
                 if (file.isDirectory()) 
                 {
                   getPytestPaths(path.join(dir, file.name), callback);
@@ -60,7 +61,7 @@ jobs:
                 else
                 {
                   extension = path.extname(file.name);
-                  console.log(file.name)
+
                   if (extension == '.py')
                   {
                     callback(dir);
