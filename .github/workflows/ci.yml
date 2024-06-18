@@ -55,7 +55,7 @@ jobs:
               {
                 if (file.isDirectory()) 
                 {
-                  getPytestPaths(path.join(dir, file.name));
+                  getPytestPaths(path.join(dir, file.name), callback);
                 } 
                 else
                 {
