@@ -51,6 +51,7 @@ jobs:
             function getPytestPaths(dir, callback) 
             {
               const files = fs.readdirSync(dir, { withFileTypes: true });
+              console.log(files)
               for (const file of files) 
               {
                 console.log(file.name)
