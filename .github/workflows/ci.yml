@@ -45,7 +45,7 @@ jobs:
         with:
           script: |
             const { CHANGED_FILES } = process.env
-            console.log(CHANGED_FILES)
+            console.log(typeof CHANGED_FILES)
       - name: Setup test environment
         uses: conda-incubator/setup-miniconda@v2
         with:
