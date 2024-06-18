@@ -93,5 +93,5 @@ jobs:
               python -m pip install pytest
       - name: Run tests
         run: |
-          pytest
+          pytest ${{ steps.tests_to_run.outputs.pytestArgs }}
         
