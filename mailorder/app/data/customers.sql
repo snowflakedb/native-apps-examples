@@ -7,4 +7,3 @@ create table if not exists
 
 grant select on data.customers to application role app_csr;
 grant select, insert, update, delete, truncate on data.customers to application role app_admin;
-
