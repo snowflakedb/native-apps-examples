@@ -61,7 +61,7 @@ jobs:
                 {
                   extension = path.extname(file.name);
 
-                  if (extension == '.py')
+                  if (extension == '.py' && !file.name.startsWith('test'))
                   {
                     callback(dir);
                   }
