@@ -73,7 +73,7 @@ jobs:
 
             const paths = new Set(CHANGED_FILES.split(" ")
                           .map(path => path.substring(0, path.indexOf("/") + 1))
-                          .filter(x => path.length > 0 && !path.startsWith('.')));
+                          .filter(path => path.length > 0 && !path.startsWith('.')));
             
             for (const rootPath of paths) 
             {
