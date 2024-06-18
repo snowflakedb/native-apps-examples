@@ -73,9 +73,10 @@ jobs:
                           .map(x => x.substring(0, x.indexOf("/") + 1))
                           .filter(x => x.length > 0 && !x.startsWith('.')));
             
+            const pytestPaths = new Set()
             for (const rootPath of paths) 
             {
-              getPytestPaths(rootPath, x => console.log(x))
+              getPytestPaths(rootPath, x => pytestPaths.add(x))
             }
 
       - name: Setup test environment
