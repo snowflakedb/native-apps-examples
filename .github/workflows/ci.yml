@@ -48,7 +48,7 @@ jobs:
             const fs = require('fs');
             const path = require('path');
 
-            function getPytestPaths(dir) 
+            /*function getPytestPaths(dir) 
             {
               const files = fs.readdirSync(dir, { withFileTypes: true });
               for (const file of files) 
@@ -66,7 +66,7 @@ jobs:
                   }
                 }
               }
-            }
+            }*/
 
             const paths = new Set(CHANGED_FILES.split(" ")
                           .map(x => x.substring(0, x.indexOf("/") + 1))
@@ -74,10 +74,10 @@ jobs:
             
             for (const rootPath of paths) 
             {
-                for (const path of getPytestPaths(rootPath))
+                /*for (const path of getPytestPaths(rootPath))
                 {
                   console.log(path);
-                }
+                }*/
             }
 
       - name: Setup test environment
