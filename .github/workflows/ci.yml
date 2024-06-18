@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 jobs:          
-  build-mailorder:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -38,12 +38,14 @@ jobs:
             else
                 echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
             fi
-      - name: List changed files
-        run: |
-            for changed_file in ${{ steps.changed-files.outputs.changed_files }}; do
-              DIR="$(dirname "${changed_file}")"        
-              echo "${DIR}"
-            done
+      - name: Determine tests to run
+        uses: actions/github-script@v7
+        env:
+          CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
+        with:
+          script: |
+            const { CHANGED_FILES } = process.env
+            console.log(CHANGED_FILES)
       - name: Setup test environment
         uses: conda-incubator/setup-miniconda@v2
         with:
