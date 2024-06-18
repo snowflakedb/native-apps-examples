@@ -76,8 +76,7 @@ jobs:
             
             for (const rootPath of paths) 
             {
-              
-              //getPytestPaths(rootPath, path => console.log(path))
+              getPytestPaths(rootPath, x => console.log(x))
             }
 
       - name: Setup test environment
