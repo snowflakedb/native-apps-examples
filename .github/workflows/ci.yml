@@ -80,8 +80,8 @@ jobs:
               getPytestPaths(rootPath, x => pytestPaths.add(x))
             }
             
-            core.setOutput('pytestPaths', pytestPaths.join(' '));
-            core.setOutput('pytestArgs', paths.join(' '));
+            core.setOutput('pytestPaths', [...pytestPaths].join(' '));
+            core.setOutput('pytestArgs', [...paths].join(' '));
 
       - name: Setup test environment
         uses: conda-incubator/setup-miniconda@v2
