@@ -77,7 +77,9 @@ jobs:
             
             for (const rootPath of paths) 
             {
-                getPytestPaths(rootPath, path => console.log(path))
+              const files = fs.readdirSync(dir, { withFileTypes: true });
+              console.log(files)  
+              //getPytestPaths(rootPath, path => console.log(path))
             }
 
       - name: Setup test environment
