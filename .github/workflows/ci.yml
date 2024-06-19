@@ -75,13 +75,24 @@ jobs:
                           .filter(x => x.length > 0 && !x.startsWith('.')));
             
             const pytestPaths = new Set()
+            const pytestArgs = new Set()
             for (const rootPath of paths) 
-            {
-              getPytestPaths(rootPath, x => pytestPaths.add(x))
+            { 
+              let subFoldersWithPythonFiles = 0;
+              getPytestPaths(rootPath, x => 
+              {
+                pytestPaths.add(x);
+                subFoldersWithPythonFiles++
+              })
+
+              if (subFoldersWithPythonFiles > 0)
+              {
+                pytestArgs.add(rootPath)
+              }
             }
             
             core.setOutput('pytestPaths', [...pytestPaths].join(' '));
-            core.setOutput('pytestArgs', [...paths].join(' '));
+            core.setOutput('pytestArgs', [...pytestArgs].join(' '));
 
       - name: Setup test environment
         uses: conda-incubator/setup-miniconda@v2
@@ -94,7 +105,8 @@ jobs:
       - name: Run tests
         run: |
           args=${{ steps.tests_to_run.outputs.pytestArgs }}
-          if [ -z "${args}" ]; then
+          pythonpath=${{ steps.tests_to_run.outputs.pytestPaths }}
+          if [ -z "${args}" ] || [ -z "${pythonpath}" ]; then
             echo “Nothing to test”
           else
             pytest $args
