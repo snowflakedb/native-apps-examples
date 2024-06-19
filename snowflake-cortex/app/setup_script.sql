@@ -8,25 +8,12 @@ CREATE APPLICATION ROLE IF NOT EXISTS app_public;
 -- 2. Create a versioned schema to hold those UDFs/Stored Procedures
 CREATE OR ALTER VERSIONED SCHEMA core;
 GRANT USAGE ON SCHEMA core TO APPLICATION ROLE app_public;
--- 3. Create a view referencing the shared view in the package shared-content.sql.
-CREATE VIEW IF NOT EXISTS core.shared_view
-AS SELECT * FROM package_shared.PROVIDER_SPOTIFY_VIEW;
+-- -- 3. Create a view referencing the shared view in the package shared-content.sql.
+-- CREATE VIEW IF NOT EXISTS core.shared_view
+-- AS SELECT * FROM package_shared.PROVIDER_SPOTIFY_VIEW;
 
--- 4. Grant appropriate privileges over the view to your application roles. 
-GRANT SELECT ON VIEW core.shared_view TO APPLICATION ROLE app_public;
-
--- GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO APPLICATION ROLE app_public;
-
--- CREATE OR REPLACE PROCEDURE CORE.CORTEX_TEXT()
--- RETURNS STRING
--- LANGUAGE SQL
--- AS $$
---      BEGIN
---           RETURN (SELECT SNOWFLAKE.CORTEX.COMPLETE('snowflake-arctic', 'What are large language models?'));
---      END;
--- $$;
-
--- GRANT USAGE ON PROCEDURE CORE.CORTEX_TEXT() TO APPLICATION ROLE app_public;
+-- -- 4. Grant appropriate privileges over the view to your application roles. 
+-- GRANT SELECT ON VIEW core.shared_view TO APPLICATION ROLE app_public;
 
 -- 3. Create a streamlit object using the code you wrote in you wrote in src/module-ui, as shown below. 
 -- The `from` value is derived from the stage path described in snowflake.yml
