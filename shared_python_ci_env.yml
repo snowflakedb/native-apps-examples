@@ -1,0 +1,15 @@
+# This file is used to install packages for local testing
+name: native-apps-examples-testing
+channels:
+  - snowflake
+dependencies:
+  - python=3.8
+  - pip
+  - pip:
+      - git+https://github.com/snowflakedb/snowflake-telemetry-python.git
+      - snowflake-native-apps-permission-stub
+      - snowflake-snowpark-python>=1.15.0
+      - snowflake-cli-labs>=2.0.0
+      - pytest
+      - streamlit>=1.26.0
+
