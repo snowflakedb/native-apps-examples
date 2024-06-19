@@ -78,7 +78,7 @@ jobs:
             const pytestArgs = new Set()
             for (const rootPath of paths) 
             { 
-              var count = 0;
+              let count = 0;
               getPytestPaths(rootPath, x => 
               {
                 pytestPaths.add(x);
