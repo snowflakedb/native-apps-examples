@@ -78,14 +78,14 @@ jobs:
             const pytestArgs = new Set()
             for (const rootPath of paths) 
             { 
-              let count = 0;
+              let subFoldersWithPythonFiles = 0;
               getPytestPaths(rootPath, x => 
               {
                 pytestPaths.add(x);
-                count++
+                subFoldersWithPythonFiles++
               })
 
-              if (count > 0)
+              if (subFoldersWithPythonFiles > 0)
               {
                 pytestArgs.add(rootPath)
               }
