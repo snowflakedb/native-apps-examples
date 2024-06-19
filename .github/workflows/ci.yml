@@ -75,13 +75,24 @@ jobs:
                           .filter(x => x.length > 0 && !x.startsWith('.')));
             
             const pytestPaths = new Set()
+            const pytestArgs = new Set()
             for (const rootPath of paths) 
-            {
-              getPytestPaths(rootPath, x => pytestPaths.add(x))
+            { 
+              var count = 0;
+              getPytestPaths(rootPath, x => 
+              {
+                pytestPaths.add(x);
+                count++
+              })
+
+              if (count > 0)
+              {
+                pytestArgs.add(rootPath)
+              }
             }
             
             core.setOutput('pytestPaths', [...pytestPaths].join(' '));
-            core.setOutput('pytestArgs', [...paths].join(' '));
+            core.setOutput('pytestArgs', [...pytestArgs].join(' '));
 
       - name: Setup test environment
         uses: conda-incubator/setup-miniconda@v2
