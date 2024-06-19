@@ -7,6 +7,6 @@ native_app:
       dest: ./
     - src: src/ui/*
       dest: streamlit/
-  # package:
-  #   scripts:
-  #     - scripts/shared_content.sql
+  package:
+    scripts:
+      - scripts/shared_content.sql
