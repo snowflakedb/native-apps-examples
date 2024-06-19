@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - environment-file: local_test_env.yml
+          - environment-file: shared_python_ci_env.yml
     defaults:
       run:
         shell: bash -l {0}
@@ -62,7 +62,7 @@ jobs:
                 {
                   extension = path.extname(file.name);
 
-                  if (extension == '.py' && !file.name.startsWith('test'))
+                  if (extension == '.py')
                   {
                     callback(dir);
                   }
