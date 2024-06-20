@@ -5,3 +5,4 @@ channels:
 - snowflake
 dependencies:
 - streamlit=1.31.0
+- snowflake-ml-python
