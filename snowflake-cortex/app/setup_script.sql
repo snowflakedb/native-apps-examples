@@ -13,7 +13,7 @@ GRANT USAGE ON SCHEMA core TO APPLICATION ROLE app_public;
 -- The `from` value is derived from the stage path described in snowflake.yml
 CREATE STREAMLIT core.ui
      FROM '/streamlit/'
-     MAIN_FILE = 'ui.py';
+     MAIN_FILE = 'dashboard.py';
 
 -- 4. Grant appropriate privileges over these objects to your application roles. 
 GRANT USAGE ON STREAMLIT core.ui TO APPLICATION ROLE app_public;
