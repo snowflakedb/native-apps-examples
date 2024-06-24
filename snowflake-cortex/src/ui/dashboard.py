@@ -4,7 +4,7 @@ from cortexCaller import CortexCaller
 
 class Dashboard:
    
-   def __init__(self, session: Session, cortex_caller: CortexCaller) -> None:
+   def __init__(self, session: Session = Session.builder.getOrCreate(), cortex_caller: CortexCaller = CortexCaller()) -> None:
       self.session = session
       self.cortex_caller = cortex_caller
       
