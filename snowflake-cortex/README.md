@@ -1,8 +1,18 @@
+This Native App examplifies how to implement the Cortex Complete and to make it interact with user data.
+
+For this usecase, the dataset used is rather small, with only 10 entries, this is because the language model used in the Cortex function restricts the bytes of input data size and costs. YOu can change the language model used to a bigger or different style according to your necessities.
+For more information about it please visit **[this page](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#cost-considerations)**.
+
 To run this example first execute this command:
-```bash
+```sh
 snow sql -f 'prepare/prepare_data.sql'
 ```
 
 Then run `snow app run` on your terminal.
 
-Currently it has a very short dataset due to llm model bytes limit.
+To delete the database and the app run
+
+```sh
+snow sql -q 'DROP DATABASE SPOTIFY_CORTEX_DB;'
+snow app teardown
+```

@@ -4,7 +4,7 @@ from cortexCaller import CortexCaller
 
 class Dashboard:
    
-   def __init__(self, session: Session = Session.builder.getOrCreate(), cortex_caller: CortexCaller = CortexCaller()) -> None:
+   def __init__(self, session: Session, cortex_caller: CortexCaller = CortexCaller()) -> None:
       self.session = session
       self.cortex_caller = cortex_caller
       
@@ -23,4 +23,4 @@ class Dashboard:
          cortex_chat.chat_message("assistant").write(cortex_fn)
 
 if __name__ == '__main__':
-   Dashboard().run_streamlit()
+   Dashboard(Session.builder.getOrCreate()).run_streamlit()
