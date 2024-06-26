@@ -27,6 +27,7 @@ Some applications require other account-level setup before they can be properly 
 | [Object-level References](./object-level-references/) | A simple dashboard to show how to interact with the object-level references and bindings. |
 | [Reference Usage](./reference-usage/) | How to share a provider table with a native application whose data is replicated to any consumer in the data cloud. |
 | [SPCS Three-tier](./spcs-three-tier/) | A simple three-tiered web app that can be deployed in Snowpark Container Services. It queries the TPC-H 100 data set and returns the top sales clerks. |
+| [Snowflake-Cortex](./snowflake-cortex/) | A simple example on how to implement the Cortex Complete and to make it interact with user data. |
 | [Tasks and Streams](./tasks-streams/) | How to execute a task and visualize changes using streams within a native application. |
 
 ## Contributing
