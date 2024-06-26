@@ -1,3 +1,3 @@
-sh setup.sh
+bash setup.sh
 sh deploy.sh
 sh cleanup.sh
