@@ -12,4 +12,5 @@ dependencies:
       - snowflake-cli-labs>=2.0.0
       - pytest
       - streamlit>=1.26.0
+      - snowflake-ml-python
 
