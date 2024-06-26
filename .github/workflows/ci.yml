@@ -1,0 +1,115 @@
+name: native-app-examples
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - labeled
+      - unlabeled
+      - synchronize
+
+permissions:
+  contents: read
+
+jobs:          
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - environment-file: shared_python_ci_env.yml
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+      - name: Get changed files
+        id: changed-files
+        run: |
+            if ${{ github.event_name == 'pull_request' }}; then
+                echo "changed_files=$(git diff --name-only -r HEAD^1 HEAD | xargs)" >> $GITHUB_OUTPUT
+            else
+                echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
+            fi
+      - name: Determine tests to run
+        uses: actions/github-script@v7
+        id: tests_to_run
+        env:
+          CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
+        with:
+          script: |
+            const { CHANGED_FILES } = process.env;
+            const fs = require('fs');
+            const path = require('path');
+
+            function getPytestPaths(dir, callback) 
+            {
+              const files = fs.readdirSync(dir, { withFileTypes: true });
+              for (const file of files) 
+              {
+                if (file.isDirectory()) 
+                {
+                  getPytestPaths(path.join(dir, file.name), callback);
+                } 
+                else
+                {
+                  extension = path.extname(file.name);
+
+                  if (extension == '.py')
+                  {
+                    callback(dir);
+                  }
+                }
+              }
+            }
+
+            const paths = new Set(CHANGED_FILES.split(" ")
+                          .map(x => x.substring(0, x.indexOf("/") + 1))
+                          .filter(x => x.length > 0 && !x.startsWith('.')));
+            
+            const pytestPaths = new Set()
+            const pytestArgs = new Set()
+            for (const rootPath of paths) 
+            { 
+              let subFoldersWithPythonFiles = 0;
+              getPytestPaths(rootPath, x => 
+              {
+                pytestPaths.add(x);
+                subFoldersWithPythonFiles++
+              })
+
+              if (subFoldersWithPythonFiles > 0)
+              {
+                pytestArgs.add(rootPath)
+              }
+            }
+            
+            core.setOutput('pytestPaths', [...pytestPaths].join(' '));
+            core.setOutput('pytestArgs', [...pytestArgs].join(' '));
+
+      - name: Setup test environment
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+            environment-file: ${{ matrix.environment-file }}
+      - name: Install dependencies
+        run: |
+              printf "[pytest]\npythonpath=${{ steps.tests_to_run.outputs.pytestPaths }}" > pytest.ini
+              python -m pip install pytest
+      - name: Run tests
+        run: |
+          args=${{ steps.tests_to_run.outputs.pytestArgs }}
+          pythonpath=${{ steps.tests_to_run.outputs.pytestPaths }}
+          if [ -z "${args}" ] || [ -z "${pythonpath}" ]; then
+            echo “Nothing to test”
+          else
+            pytest $args
+          fi
+          
+        
