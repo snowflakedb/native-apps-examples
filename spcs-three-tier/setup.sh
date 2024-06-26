@@ -19,14 +19,14 @@ cp $frontend_yaml_template $frontend_yaml
 cp $backend_yaml_template $backend_yaml
 
 # Replace placeholders in Makefile file using | as delimiter
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i "" "s|<<REPOSITORY>>|$repository_url|g" $makefile
+    sed -i "" "s|<<REPOSITORY>>|$repository_url|g" $frontend_yaml
+    sed -i "" "s|<<REPOSITORY>>|$repository_url|g" $backend_yaml   
+else
     sed -i "s|<<REPOSITORY>>|$repository_url|g" $makefile
     sed -i "s|<<REPOSITORY>>|$repository_url|g" $frontend_yaml
     sed -i "s|<<REPOSITORY>>|$repository_url|g" $backend_yaml
-else
-    sed -i "" "s|<<REPOSITORY>>|$repository_url|g" $makefile
-    sed -i "" "s|<<REPOSITORY>>|$repository_url|g" $frontend_yaml
-    sed -i "" "s|<<REPOSITORY>>|$repository_url|g" $backend_yaml
 fi
 
 make all
