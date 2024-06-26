@@ -1,3 +1,4 @@
+#!/bin/bash
 set -e
 snow sql -f "prepare/spcs_setup.sql"
 snow sql -f "prepare/provider_setup.sql"
