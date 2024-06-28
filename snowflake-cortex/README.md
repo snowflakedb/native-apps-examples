@@ -1,6 +1,6 @@
 # Snowflake Cortex
 
-This simple Native App shows how to use Cortex Complete and make it interact with user data..
+This simple Native App shows how to use Cortex Complete and make it interact with user data.
 
 For this use case, the dataset used is rather small: only 10 entries. This is because the language model used in the Cortex function restricts input data size. You can change the language model used to a bigger / different one, according to your needs.
 For more information about it please visit **[this page](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#cost-considerations)**.
