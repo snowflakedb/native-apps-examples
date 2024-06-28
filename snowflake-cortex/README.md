@@ -7,9 +7,9 @@ For more information about it please visit **[this page](https://docs.snowflake.
 
 ## Data preparation
 
-To run this example first execute this command, that is going to create a database and table with information about spotify songs:
+To run this example first execute this command, that is going to create a database and table with information about songs charts:
 ```sh
-snow sql -f 'prepare/prepare_data.sql'
+snow sql -f 'prepare/provider_data.sql'
 ```
 ## App execution
 
@@ -19,7 +19,7 @@ Then run `snow app run` on your terminal.
 To delete the database and the app run
 
 ```sh
-snow sql -q 'DROP DATABASE SPOTIFY_CORTEX_DB;'
+snow sql -q 'DROP DATABASE SONGS_CORTEX_DB;'
 snow app teardown
 ```
 

@@ -10,9 +10,9 @@ class Dashboard:
       
    def run_streamlit(self):
       st.header('Snowflake Cortex Example')
-      st.subheader("Simple app showing how cortex can answer questions using the following spotify's ranking table")
+      st.subheader("Simple app showing how cortex can answer questions using the following song's ranking table")
 
-      table_df = self.session.table("PACKAGE_SHARED.PROVIDER_SPOTIFY_VIEW").to_pandas()
+      table_df = self.session.table("PACKAGE_SHARED.PROVIDER_SONGS_VIEW").to_pandas()
       st.write(table_df)
 
       cortex_chat = st.container(height=200)
