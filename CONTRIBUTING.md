@@ -2,6 +2,7 @@
 
 By default, GitHub disables any workflows (or CI/CD pipelines) when forking a repository. The forked repository contains a CI/CD workflow to deploy your data pipeline to dev and prod environments. Enable the workflows by opening your forked repository in GitHub, clicking on the `Actions` tab near the top middle of the page, and then clicking on the "I understand my workflows, go ahead and enable them" green button.
 
+You must also add the appropriate secrets to your fork to enable integration tests; see the configuration section below.
 ## Python Tests Workflow (Unit Tests)
 
 Unit tests only runs when there are changes or additions in native apps containing python files. The [pipeline](./.github/workflows/ci.yml) detects which apps were changed and only the tests for those apps are going to be executed.
