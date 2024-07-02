@@ -19,7 +19,7 @@ Same as *Unit Tests*, Integration Tests runs only for apps that were added/modif
 
 ### Configuration
 
-Integration Tests depends on the `Snowflake CLI` to connect to your Snowflake account, so we need to set up some credentials before start contributing the repository. Action Secrets in GitHub are used to securely store values/variables for use in CI/CD pipelines.
+Integration Tests depends on `Snowflake CLI` to connect to your Snowflake account; we need to set up some credentials before these tests will run. GitHub Secrets are used to securely store values/variables for use in CI/CD pipelines.
 
 In GitHub, click on the `Settings` tab near the top of the page. From the Settings page, click on the `Secrets and variables` then `Actions` tab in the left hand navigation. The "Secrets" tab should be selected. For each secret listed below click on the green `New repository secret` and enter the name given below along with the appropriate value (adjusting as appropriate).
 
