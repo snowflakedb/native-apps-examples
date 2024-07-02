@@ -37,6 +37,19 @@ Once the GitHub secrets are set, you are able to contribute in the repo.
 
 Integration Tests Workflow uses the [snowflake-cli-action](https://github.com/Snowflake-Labs/snowflake-cli-action), that basically installs the `Snowflake CLI` in our workflow environment.
 
-For each modify app, we test that `snow app run` and `snow app teardown` commands run successfully, that means that we are verify that the app were deployed and removed successfully from our Snowflake account.
+#### Apps that depends on existing data.
 
-For apps that requieres some data before deployment, we provide a capability to define a `ci.sh` file in the root of the app, that executes all the steps required to deploy the app successfully.
+For apps that requieres some data before deployment, we provide a capability to define a `ci.sh` file in the root of the app, that executes all the steps required to deploy the app successfully. E.g.
+
+```bash
+# ci.yml
+
+set -e
+bash setup.sh
+./deploy.sh
+./cleanup.sh
+```
+
+#### Default behavior
+
+If there are no `ci.yml` file, we just execute the `snow app run` and `snow app teardown` commands. That means that we are verify that the app were deployed and removed successfully from our Snowflake account.
