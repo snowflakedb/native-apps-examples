@@ -4,7 +4,7 @@ manifest_version: 1
 artifacts:
   setup_script: setup_script.sql
   readme: README.md
-  default_streamlit: core.dashbaord
+  default_streamlit: core.ui
   extension_code: true 
 
 privileges:
