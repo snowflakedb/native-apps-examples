@@ -1,13 +1,6 @@
 name: native-app-examples
 
-on:
-  pull_request:
-    types:
-      - opened
-      - edited
-      - labeled
-      - unlabeled
-      - synchronize
+on: [ pull_request, push ]
 
 permissions:
   contents: read
