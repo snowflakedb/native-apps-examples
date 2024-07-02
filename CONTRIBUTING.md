@@ -42,7 +42,7 @@ Integration Tests Workflow uses the [snowflake-cli-action](https://github.com/Sn
 For apps that requieres some data before deployment, we provide a capability to define a `ci.sh` file in the root of the app, that executes all the steps required to deploy the app successfully. E.g.
 
 ```bash
-# ci.yml
+# ci.sh
 
 set -e
 bash setup.sh
@@ -52,4 +52,4 @@ bash setup.sh
 
 #### Default behavior
 
-If there are no `ci.yml` file, we just execute the `snow app run` and `snow app teardown` commands. That means that we are verify that the app were deployed and removed successfully from our Snowflake account.
+If there are no `ci.sh` file, we just execute the `snow app run` and `snow app teardown` commands. That means that we are verify that the app were deployed and removed successfully from our Snowflake account.
