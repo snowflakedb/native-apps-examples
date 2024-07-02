@@ -32,3 +32,5 @@ Some applications require other account-level setup before they can be properly 
 ## Contributing
 
 Contributions are welcome and encouraged under the [Apache 2.0 License](./LICENSE.txt). Please feel free to open issues or pull requests.
+
+For more information about contributing, see [CONTRIBUTING.md](./CONTRIBUTING.md)
