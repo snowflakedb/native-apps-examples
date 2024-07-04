@@ -17,8 +17,10 @@ class UI:
         st.dataframe(self.session.table('internal.dictionary').to_pandas(), use_container_width=True)
 
     def add(self, key: str, value: str):
-        result = self.session.call('core.add_key_value', key, value)
-        st.write(json.loads(result))
+        result = json.loads(self.session.call('core.add_key_value', key, value))
+        if "SQLCODE" in result:
+            error = f"Primary key violation on Hybrid Table. **{key}** already exists." if result["SQLCODE"] == 200001 else result["SQLERRM"]
+            st.error(error, icon="🚨")
 
 if __name__ == '__main__':
     ui = UI(Session.builder.getOrCreate())
