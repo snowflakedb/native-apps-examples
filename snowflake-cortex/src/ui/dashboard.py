@@ -17,15 +17,15 @@ class Dashboard:
       """)
       privilege = 'IMPORTED PRIVILEGES ON SNOWFLAKE DB'
       if not permission.get_held_account_privileges([privilege]):
-         st.button(f"Grant import privileges on snowflake DB ↗", on_click=permission.request_account_privileges, args=[[privilege]], key=privilege)
+         st.button(f"Grant import privileges on snowflake DB ↗", on_click=permission.request_account_privileges, args=[[privilege]], key='IMPORTED PRIVILEGES ON SNOWFLAKE DB')
       else:
          st.session_state.privileges_granted = True
-         st.experimental_rerun()
+         st.rerun()
 
    def run_streamlit(self):
       if not permission.get_held_account_privileges(['IMPORTED PRIVILEGES ON SNOWFLAKE DB']):
          del st.session_state.privileges_granted
-         st.experimental_rerun()
+         st.rerun()
       
       st.header('Snowflake Cortex Example')
       st.subheader("Simple app showing how cortex can answer questions using the following song's ranking table")
