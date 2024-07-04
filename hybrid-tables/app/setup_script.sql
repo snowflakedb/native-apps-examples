@@ -36,7 +36,7 @@ BEGIN
 END;
 $$;
 
-CREATE STREAMLIT core.ui
+CREATE OR REPLACE STREAMLIT core.ui
      FROM '/streamlit/'
      MAIN_FILE = 'ui.py';
 
