@@ -1,0 +1,12 @@
+# This file is used to install packages for local testing
+name: hybrid-tables-testing
+channels:
+  - snowflake
+dependencies:
+  - python=3.8
+  - pip
+  - pip:
+      - snowflake-snowpark-python>=1.15.0
+      - pytest
+      - streamlit>=1.26.0
+
