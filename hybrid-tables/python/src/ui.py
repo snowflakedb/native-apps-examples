@@ -12,7 +12,10 @@ class UI:
             key = col1.text_input('Add a key', key='Key')
             value = col2.text_input('Add a value for the key', key='Value')
             if st.form_submit_button('Add'):
-                self.add(key, value)
+                if key == '' or value == '':
+                    st.error("Key-value pairs should not be empty")           
+                else: 
+                    self.add(key, value)
 
         st.dataframe(self.session.table('internal.dictionary').to_pandas(), use_container_width=True)
 
