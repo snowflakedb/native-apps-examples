@@ -104,8 +104,8 @@ jobs:
               python -m pip install pytest
       - name: Run tests
         run: |
-          args=${{ steps.tests_to_run.outputs.pytestArgs }}
-          pythonpath=${{ steps.tests_to_run.outputs.pytestPaths }}
+          args="${{ steps.tests_to_run.outputs.pytestArgs }}"
+          pythonpath="${{ steps.tests_to_run.outputs.pytestPaths }}"
           if [ -z "${args}" ] || [ -z "${pythonpath}" ]; then
             echo “Nothing to test”
           else

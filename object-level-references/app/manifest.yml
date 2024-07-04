@@ -9,7 +9,7 @@ version:
 artifacts:
   setup_script: setup_script.sql
   readme: README.md
-  default_streamlit: core.dashboard
+  default_streamlit: core.ui
   extension_code: true 
   
 references:
