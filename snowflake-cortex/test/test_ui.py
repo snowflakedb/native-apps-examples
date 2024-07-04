@@ -39,7 +39,7 @@ def test_not_granted_privileges(get_held_account_privileges: MagicMock, session,
 
     get_held_account_privileges.return_value = False
 
-    at = AppTest.from_file("./src/ui/dashboard.py").run()
+    at = AppTest.from_file("../src/ui/dashboard.py").run()
     assert at.header[0].value == 'Privileges setup'
     assert at.caption[0].value == 'Follow the instructions below to set up your application.\nOnce you have completed the steps, you will be able to continue to the main example.'
     assert at.button[0].label == 'Grant import privileges on snowflake DB ↗'
