@@ -64,3 +64,7 @@ You can deploy the application in dev mode as follows:
 ```sh
 snow app run
 ```
+
+## Additional Resources
+
+- [Hybrid Tables](https://docs.snowflake.com/en/user-guide/tables-hybrid)
