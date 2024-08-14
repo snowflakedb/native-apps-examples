@@ -49,27 +49,18 @@ $$;
 
 GRANT USAGE ON PROCEDURE versioned_schema.get_configuration(STRING) TO APPLICATION ROLE app_admin;
 
--- The version initializer callback is executed after a successful installation, upgrade, or downgrade of an application object.
--- In case the application fails to upgrade, the version initializer of the previous (successful) version will be executed so you
--- can clean up application state that may have been modified during the failed upgrade.
-
--- this is the first the version(version v1 patch 0) of the app package. We consider the case that when the
--- app is upgraded to next version and try to alter the services and it fails. In that case
--- it will fail back to version v1 patch 0 and call this procedure versioned_schema.init() to
--- restore the services and app can fully function.
+-- The version initializer callback is executed after a successful run of the setup script.
+-- In case the versioned_schema.init() failed, the version initializer of the previous version will be executed
 CREATE OR REPLACE PROCEDURE versioned_schema.init()
-RETURNS STRING
+RETURNS STRING 
 LANGUAGE SQL
-EXECUTE AS OWNER
+EXECUTE AS OWNER 
 AS
 $$
-BEGIN
-    --create services if not exist
-    call versioned_schema.create_services();
-    --wait for 300 seconds, but it will stop if two services have READY status,
-    -- or any of the services has the FAILED status.
+BEGIN    
+    ALTER SERVICE IF EXISTS app_public.frontend FROM SPECIFICATION_FILE='frontend.yaml';
+    ALTER SERVICE IF EXISTS app_public.backend FROM SPECIFICATION_FILE='backend.yaml';
     select system$wait_for_services(300, 'app_public.backend', 'app_public.frontend');
-
     RETURN 'init complete';
 END $$;
 
@@ -105,7 +96,7 @@ $$;
 GRANT USAGE ON PROCEDURE versioned_schema.start_frontend(VARCHAR) TO APPLICATION ROLE app_admin;
 
 
-CREATE OR REPLACE PROCEDURE versioned_schema.create_services()
+CREATE OR REPLACE PROCEDURE versioned_schema.create_services(privileges array)
  RETURNS STRING
  LANGUAGE SQL
  AS 
@@ -123,13 +114,9 @@ CREATE OR REPLACE PROCEDURE versioned_schema.create_services()
 
         CALL versioned_schema.start_backend('backend_compute_pool');
         CALL versioned_schema.start_frontend('frontend_compute_pool');
-
-        # needed for installation from listing/cross account
-        GRANT SERVICE ROLE app_public.frontend!ALL_ENDPOINTS_USAGE TO APPLICATION ROLE app_admin;
-
-       GRANT USAGE ON PROCEDURE versioned_schema.create_services( ) TO APPLICATION ROLE app_admin;
     END;
 $$;
+GRANT USAGE ON PROCEDURE versioned_schema.create_services(array) TO APPLICATION ROLE app_admin;
 
 
 CREATE OR REPLACE PROCEDURE app_public.stop_app()

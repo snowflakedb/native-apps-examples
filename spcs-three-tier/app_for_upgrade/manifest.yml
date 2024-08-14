@@ -1,10 +1,7 @@
-manifest_version: 1
+manifest_version: 2
 version:
   name: versioned_schema
-  label: "First Version"
-
-configuration:
-  grant_callback: versioned_schema.create_services
+  label: "Second Version"
 
 artifacts:
   setup_script: setup.sql

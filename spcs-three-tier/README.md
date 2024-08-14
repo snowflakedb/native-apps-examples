@@ -123,6 +123,24 @@ See the [documentation](https://other-docs.snowflake.com/en/native-apps/provider
 
 8. Click "Publish".
 
+
+#### Upgrade
+In the provider account
+
+alter application package spcs_app_pkg add version v1 using @spcs_app_pkg.napp.app_stage;
+alter application package spcs_app_pkg set default release directive version=v1 patch=0;
+
+add patch 
+alter application package spcs_app_pkg add patch for version v1 using @spcs_app_pkg.napp.app_stage;
+alter application package spcs_app_pkg set default release directive version=v1 patch=1; 
+
+add version v2
+alter application package spcs_app_pkg add version v2 using @spcs_app_pkg.napp.app_stage;
+alter application package spcs_app_pkg set default release directive version=v2 patch=1;
+
+Check the status:
+If you have multiple 
+
 ### Debugging
 There are some Stored Procedures to allow the Consumer to see the status
 and logs for the containers and services. These procedures are granted to the `app_admin`
