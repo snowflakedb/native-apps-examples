@@ -1,6 +1,6 @@
 manifest_version: 1
 version:
-  name: versioned_schema
+  name: v1
   label: "First Version"
 
 configuration:

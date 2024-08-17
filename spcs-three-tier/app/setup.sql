@@ -6,7 +6,6 @@ GRANT USAGE ON SCHEMA app_public TO APPLICATION ROLE app_user;
 CREATE OR ALTER VERSIONED SCHEMA versioned_schema;
 GRANT USAGE ON SCHEMA versioned_schema TO APPLICATION ROLE app_admin;
 
-
 CREATE OR REPLACE PROCEDURE versioned_schema.register_single_callback(ref_name STRING, operation STRING, ref_or_alias STRING)
  RETURNS STRING
  LANGUAGE SQL
@@ -53,7 +52,7 @@ GRANT USAGE ON PROCEDURE versioned_schema.get_configuration(STRING) TO APPLICATI
 -- In case the application fails to upgrade, the version initializer of the previous (successful) version will be executed so you
 -- can clean up application state that may have been modified during the failed upgrade.
 
--- this is the first the version(version v1 patch 0) of the app package. We consider the case that when the
+-- this is the first version(version v1 patch 0) of the app package. We consider the case that when the
 -- app is upgraded to next version and try to alter the services and it fails. In that case
 -- it will fail back to version v1 patch 0 and call this procedure versioned_schema.init() to
 -- restore the services and app can fully function.
@@ -63,13 +62,18 @@ LANGUAGE SQL
 EXECUTE AS OWNER
 AS
 $$
+DECLARE
+    can_create_compute_pool BOOLEAN;
 BEGIN
-    --create services if not exist
-    call versioned_schema.create_services();
-    --wait for 300 seconds, but it will stop if two services have READY status,
-    -- or any of the services has the FAILED status.
-    select system$wait_for_services(300, 'app_public.backend', 'app_public.frontend');
-
+    select SYSTEM$HOLD_PRIVILEGE_ON_ACCOUNT('create compute pool') into :can_create_compute_pool;
+    IF (:can_create_compute_pool) THEN
+        ALTER SERVICE IF EXISTS app_public.frontend FROM SPECIFICATION_FILE='frontend.yaml';
+        ALTER SERVICE IF EXISTS app_public.backend FROM SPECIFICATION_FILE='backend.yaml';
+        -- ALTER SERVICE is async. To minimize the downtime we need to wait until the service are ready.
+        select system$wait_for_services(180, 'app_public.backend', 'app_public.frontend');
+        -- this sql will trigger an error and the upgrade will fail
+        select * from non_exists_table;
+    END IF;
     RETURN 'init complete';
 END $$;
 
@@ -105,7 +109,7 @@ $$;
 GRANT USAGE ON PROCEDURE versioned_schema.start_frontend(VARCHAR) TO APPLICATION ROLE app_admin;
 
 
-CREATE OR REPLACE PROCEDURE versioned_schema.create_services()
+CREATE OR REPLACE PROCEDURE versioned_schema.create_services(privileges array)
  RETURNS STRING
  LANGUAGE SQL
  AS 
@@ -124,12 +128,13 @@ CREATE OR REPLACE PROCEDURE versioned_schema.create_services()
         CALL versioned_schema.start_backend('backend_compute_pool');
         CALL versioned_schema.start_frontend('frontend_compute_pool');
 
-        # needed for installation from listing/cross account
+        --needed for installation from listing/cross account
+        GRANT USAGE ON SERVICE app_public.frontend TO APPLICATION ROLE app_admin;
         GRANT SERVICE ROLE app_public.frontend!ALL_ENDPOINTS_USAGE TO APPLICATION ROLE app_admin;
-
-       GRANT USAGE ON PROCEDURE versioned_schema.create_services( ) TO APPLICATION ROLE app_admin;
     END;
 $$;
+GRANT USAGE ON PROCEDURE versioned_schema.create_services(array) TO APPLICATION ROLE app_admin;
+
 
 
 CREATE OR REPLACE PROCEDURE app_public.stop_app()
