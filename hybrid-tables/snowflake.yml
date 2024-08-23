@@ -1,0 +1,11 @@
+# This is a project definition file, a required component if you intend to use Snowflake CLI in a project directory such as this template.
+
+definition_version: 1
+native_app:
+  name: hybrid_tables
+  source_stage: app_src.stage
+  artifacts:
+    - src: app/*
+      dest: ./
+    - src: python/src/*
+      dest: streamlit/
