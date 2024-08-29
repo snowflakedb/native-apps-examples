@@ -111,6 +111,7 @@ jobs:
           else
             pytest $args
             ret=$?
+            echo $ret
             if [ "$ret" = 5 ]; then
               echo "No tests collected."
               exit 0
