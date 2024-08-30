@@ -10,6 +10,7 @@ artifacts:
   setup_script: setup_script.sql
   default_streamlit: core.ui
   extension_code: true
+  readme: README.md
 
 references:
   - external_access_reference:

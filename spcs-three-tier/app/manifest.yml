@@ -8,6 +8,7 @@ configuration:
 
 artifacts:
   setup_script: setup.sql
+  readme: README.md
 
   default_web_endpoint:
     service: app_public.frontend

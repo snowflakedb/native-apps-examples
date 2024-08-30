@@ -110,6 +110,12 @@ jobs:
             echo “Nothing to test”
           else
             pytest $args
+            ret=$?
+            echo $ret
+            if [ "$ret" = 5 ]; then
+              echo "No tests collected."
+              exit 0
+            fi
+            exit "$ret"
           fi
-          
         
