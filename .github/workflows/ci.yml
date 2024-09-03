@@ -1,13 +1,6 @@
 name: native-app-examples
 
-on:
-  pull_request:
-    types:
-      - opened
-      - edited
-      - labeled
-      - unlabeled
-      - synchronize
+on: [ pull_request, push ]
 
 permissions:
   contents: read
@@ -30,24 +23,20 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: "3.10"
-      - name: Get changed files
-        id: changed-files
-        run: |
-            if ${{ github.event_name == 'pull_request' }}; then
-                echo "changed_files=$(git diff --name-only -r HEAD^1 HEAD | xargs)" >> $GITHUB_OUTPUT
-            else
-                echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
-            fi
+      - name: Get modified apps
+        id: modified-apps-step
+        uses: ./.github/actions/modified_apps
       - name: Determine tests to run
         uses: actions/github-script@v7
         id: tests_to_run
         env:
-          CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
+          MODIFIED_APPS: ${{ steps.modified-apps-step.outputs.modified_apps }}
         with:
           script: |
-            const { CHANGED_FILES } = process.env;
+            const { MODIFIED_APPS } = process.env;
             const fs = require('fs');
             const path = require('path');
+            var has_python_tests = false;
 
             function getPytestPaths(dir, callback) 
             {
@@ -63,25 +52,29 @@ jobs:
                   extension = path.extname(file.name);
 
                   if (extension == '.py')
-                  {
-                    callback(dir);
+                  {                    
+                    callback(dir, file.name);
                   }
                 }
               }
             }
 
-            const paths = new Set(CHANGED_FILES.split(" ")
-                          .map(x => x.substring(0, x.indexOf("/") + 1))
-                          .filter(x => x.length > 0 && !x.startsWith('.')));
+            const paths = MODIFIED_APPS.length > 0 ? MODIFIED_APPS.split(",") : []
             
             const pytestPaths = new Set()
             const pytestArgs = new Set()
             for (const rootPath of paths) 
             { 
               let subFoldersWithPythonFiles = 0;
-              getPytestPaths(rootPath, x => 
+              getPytestPaths(rootPath, (folder, fileName) => 
               {
-                pytestPaths.add(x);
+                pytestPaths.add(folder);
+                
+                if (fileName.startsWith('test'))
+                {
+                  has_python_tests = true
+                }
+
                 subFoldersWithPythonFiles++
               })
 
@@ -91,12 +84,13 @@ jobs:
               }
             }
             
-            core.setOutput('pytestPaths', [...pytestPaths].join(' '));
-            core.setOutput('pytestArgs', [...pytestArgs].join(' '));
+            core.setOutput('pytestPaths', has_python_tests ? [...pytestPaths].join(' ') : "");
+            core.setOutput('pytestArgs', has_python_tests ? [...pytestArgs].join(' ') : "");
 
       - name: Setup test environment
         uses: conda-incubator/setup-miniconda@v2
         with:
+            miniconda-version: "latest"
             environment-file: ${{ matrix.environment-file }}
       - name: Install dependencies
         run: |

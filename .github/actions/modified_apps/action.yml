@@ -1,0 +1,30 @@
+name: 'Modified Apps'
+description: 'Gets the modified apps root folder'
+runs:
+  using: 'composite'
+  steps:
+    - name: Get changed files
+      id: changed-files-step
+      run: $GITHUB_ACTION_PATH/modified_files.sh
+      shell: bash
+      env:
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
+        GITHUB_EVENT_NAME:  ${{ github.event_name }}
+        GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+        GITHUB_EVENT_AFTER: ${{ github.event.after }}
+    - name: Get changed apps
+      uses: actions/github-script@v7
+      id: changed-apps-step
+      env:
+        CHANGED_FILES: ${{ steps.changed-files-step.outputs.changed_files }}
+      with:
+        script: |
+          const { CHANGED_FILES } = process.env;
+          const paths = new Set(CHANGED_FILES.split(" ")
+                        .map(x => x.substring(0, x.indexOf("/") + 1))
+                        .filter(x => x.length > 0 && !x.startsWith('.'))); 
+          core.setOutput('changedApps', [...paths].join(','));
+outputs:
+  modified_apps:
+    description: 'The modified apps folders.'
+    value: ${{ steps.changed-apps-step.outputs.changedApps }}

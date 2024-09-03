@@ -1,0 +1,9 @@
+default_connection_name = "default"
+ 
+[connections]
+[connections.default]
+account = ""
+user = ""
+password = ""
+role = ""
+warehouse = ""
