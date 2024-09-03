@@ -123,7 +123,7 @@ See the [documentation](https://other-docs.snowflake.com/en/native-apps/provider
 8. Click "Publish".
 
 
-#### Upgrade
+### Upgrade
 Upgrades can be performed in two ways:
 
 * Automated Upgrades: These occur when the provider updates the release directive on the application package, 
@@ -134,27 +134,27 @@ the upgrade.
 
 In this tutorial, we will focus on manual upgrades to demonstrate how the upgrade process works within the Native App Framework. The application is installed in the provider's account, so all commands will be executed within the provider's environment.
 
-##### Add version
+#### Add version
 ```sql
     alter application package spcs_app_pkg add version v1 using @spcs_app_pkg.napp.app_stage;
 ```
-##### Set release directive
+#### Set release directive
 ```sql
      alter application package spcs_app_pkg set default release directive version=v1 patch=0;
 ```
-##### manual upgrade
+#### manual upgrade
 ```sql
     alter application app upgrade
 ```
-##### check application status
+#### check application status
 ```sql
     desc application app
 ```
 it will show the application's current version, patch, update_state and more.
 
-##### add version v2 and upgrade
+#### add version v2 and upgrade
 
-###### change endpoints
+##### change endpoints
 in frontend.yaml
 change the endpoints from
 ```yaml
