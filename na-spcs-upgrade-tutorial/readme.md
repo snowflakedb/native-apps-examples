@@ -13,20 +13,19 @@ This guide walks through managing versions of a Snowflake Native App using Snowp
 
 This tutorial demonstrates managing lifecycle upgrades, dealing with failures, and ensuring service continuity.
 
+---
 
 
-
-
-
-
-This tutorial is built upon the tutorial `Create a Snowflake Native App with Snowpark Container Services`(https://docs.snowflake.com/en/developer-guide/native-apps/tutorials/na-spcs-tutorial).
-Please skip the last step `Teardown the app and objects`
+When following the tutorial `Create a Snowflake Native App with Snowpark Container Services`(https://docs.snowflake.
+com/en/developer-guide/native-apps/tutorials/na-spcs-tutorial), please skip the last step `Teardown the app and objects`
 
 
 So now we should have application package `NA_SPCS_TUTORIAL_PKG` and the files in the stage:
+
 ```sql
 list @na_spcs_tutorial_pkg.app_src.stage;
 ```
+
 Output:
 stage/README.md
 stage/manifest.yml
