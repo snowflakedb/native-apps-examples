@@ -1,0 +1,7 @@
+pandas
+streamlit
+streamlit-tags
+snowflake-connector-python
+snowflake-snowpark-python
+streamlit-monaco-code-editor
+st-annotated-text

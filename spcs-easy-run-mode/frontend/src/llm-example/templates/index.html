@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hugging Face LLM App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card shadow-lg p-4">
+            <h1 class="text-center mb-4">🌟 Hugging Face LLM App 🌟</h1>
+            <form method="POST" action="/">
+                <div class="mb-4">
+                    <label for="user_input" class="form-label">Enter your prompt:</label>
+                    <textarea class="form-control" id="user_input" name="user_input" rows="4" placeholder="Type your prompt here..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 btn-lg">Generate Text</button>
+            </form>
+            <hr>
+            {% if error %}
+            <div class="alert alert-danger mt-3">{{ error }}</div>
+            {% endif %}
+            {% if generated_text %}
+            <h3 class="mt-4">Generated Text:</h3>
+            <div class="alert alert-success">{{ generated_text }}</div>
+            {% endif %}
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

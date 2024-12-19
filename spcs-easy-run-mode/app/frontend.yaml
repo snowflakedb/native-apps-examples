@@ -1,0 +1,10 @@
+spec:
+  containers:
+    - name: frontend
+      image: /spcs_easyrun_db/spcs_easyrun_schema/spcs_easyrun_repo/frontend:latest
+      # env:
+      #   SNOWFLAKE_WAREHOUSE: tutorial_warehouse
+  endpoints:
+    - name: app
+      port: 8501
+      public: true

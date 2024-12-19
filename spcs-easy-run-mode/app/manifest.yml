@@ -1,0 +1,56 @@
+# This is a manifest.yml file, a required component of creating a Snowflake Native App.
+# This file defines properties required by the application package, including the location of the setup script and version definitions.
+# Refer to https://docs.snowflake.com/en/developer-guide/native-apps/creating-manifest for a detailed understanding of this file.
+
+manifest_version: 1
+
+artifacts:
+  setup_script: setup.sql
+  readme: README.md
+  extension_code: true
+  container_services:
+    images:
+      - /spcs_easyrun_db/spcs_easyrun_schema/spcs_easyrun_repo/easy-run-mode:latest
+      - /spcs_easyrun_db/spcs_easyrun_schema/spcs_easyrun_repo/frontend:latest
+  default_web_endpoint:
+    service: public.frontend_service
+    endpoint: app
+
+lifecycle_callbacks:
+  version_initializer: public.init
+  
+
+
+privileges:
+  - BIND SERVICE ENDPOINT:
+     description: "A service that can respond to requests from public endpoints."
+     required_at_setup: true
+  - CREATE COMPUTE POOL:
+     description: "Permission to create compute pools for running services"
+     required_at_setup: true
+  - CREATE WAREHOUSE:
+     description: "To create warehouses for executing tasks"
+     required_at_setup: true
+
+references:
+  - external_access_reference:
+      label: "EAI Reference"
+      description: "External Access Integration (EAI) in the consumer account that exists outside the APPLICATION object."
+      privileges:
+        - USAGE
+      object_type: EXTERNAL ACCESS INTEGRATION
+      multi_valued: false
+      register_callback: core.register_single_callback
+      configuration_callback: core.get_configuration
+      required_at_setup: true
+
+
+configuration:
+  grant_callback: public.start_frontend
+  log_level: INFO
+  trace_level: ALWAYS
+  telemetry_event_definitions:
+    - type: ERRORS_AND_WARNINGS
+      sharing: MANDATORY
+    - type: DEBUG_LOGS
+      sharing: MANDATORY

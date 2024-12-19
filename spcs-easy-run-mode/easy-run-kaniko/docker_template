@@ -1,0 +1,8 @@
+FROM ${BASE_IMG}
+
+WORKDIR /app
+COPY src/ ./
+# Check if requirements.txt exists and install packages if it does
+RUN if [ -f requirements.txt ]; then pip install --upgrade pip && pip install -r requirements.txt; fi
+
+CMD ${LAUNCH_CMD}
