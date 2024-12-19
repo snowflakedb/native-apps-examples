@@ -2,7 +2,7 @@
 
 **Note**: Snowflake CLI is in Public Preview (PuPr). You can find the official documentation and download links [here](https://docs.snowflake.com/en/developer-guide/snowflake-cli-v2/index).
 
-This repository contains example applications built using the [Snowflake Native App](https://docs.snowflake.com/en/developer-guide/native-apps/native-apps-about) Framework. These examples have been built and are supported by Snowflake Inc., are self-contained, and can be deployed directly to your account using Snowflake CLI. 
+This repository contains example applications built using the [Snowflake Native App](https://docs.snowflake.com/en/developer-guide/native-apps/native-apps-about) Framework. These examples have been built and are supported by Snowflake Inc., are self-contained, and can be deployed directly to your account using Snowflake CLI.
 
 ## Deploying example applications
 
@@ -17,18 +17,19 @@ Some applications require other account-level setup before they can be properly 
 
 ## Available examples
 
-| Application | Description |
-| --- | --- |
-| [Account Privileges](./account-privileges/) | How to add account privileges to an object reference within a native application. |
-| [Custom Billing Events](./custom-billing-events/) | How to bill costs from the provider side by adding a billing event to a procedure call. |
-| [Data Mapping](./data-mapping/) | Accompaniment to the [Data Mapping in Snowflake Native Apps using Streamlit](https://quickstarts.snowflake.com/guide/data_mapping_in_native_apps/index.html?index=..%2F..index#0) quickstart. |
-| [External Access Integration](./external-access-integration/) | How to create an external access integration and connect to an API within a native application. |
-| [Mailorder](./mailorder/) | How to implement the business operations of an imaginary mail-order business within a native application using Snowpark. |
-| [Object-level References](./object-level-references/) | A simple dashboard to show how to interact with the object-level references and bindings. |
-| [Reference Usage](./reference-usage/) | How to share a provider table with a native application whose data is replicated to any consumer in the data cloud. |
-| [SPCS Three-tier](./spcs-three-tier/) | A simple three-tiered web app that can be deployed in Snowpark Container Services. It queries the TPC-H 100 data set and returns the top sales clerks. |
-| [Snowflake Cortex](./snowflake-cortex/) | A simple example on how to implement the Cortex Complete and to make it interact with user data. |
-| [Tasks and Streams](./tasks-streams/) | How to execute a task and visualize changes using streams within a native application. |
+| Application                                                   | Description                                                                                                                                                                                   |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Account Privileges](./account-privileges/)                   | How to add account privileges to an object reference within a native application.                                                                                                             |
+| [Custom Billing Events](./custom-billing-events/)             | How to bill costs from the provider side by adding a billing event to a procedure call.                                                                                                       |
+| [Data Mapping](./data-mapping/)                               | Accompaniment to the [Data Mapping in Snowflake Native Apps using Streamlit](https://quickstarts.snowflake.com/guide/data_mapping_in_native_apps/index.html?index=..%2F..index#0) quickstart. |
+| [External Access Integration](./external-access-integration/) | How to create an external access integration and connect to an API within a native application.                                                                                               |
+| [Mailorder](./mailorder/)                                     | How to implement the business operations of an imaginary mail-order business within a native application using Snowpark.                                                                      |
+| [Object-level References](./object-level-references/)         | A simple dashboard to show how to interact with the object-level references and bindings.                                                                                                     |
+| [Reference Usage](./reference-usage/)                         | How to share a provider table with a native application whose data is replicated to any consumer in the data cloud.                                                                           |
+| [SPCS Three-tier](./spcs-three-tier/)                         | A simple three-tiered web app that can be deployed in Snowpark Container Services. It queries the TPC-H 100 data set and returns the top sales clerks.                                        |
+| [Snowflake Cortex](./snowflake-cortex/)                       | A simple example on how to implement the Cortex Complete and to make it interact with user data.                                                                                              |
+| [Tasks and Streams](./tasks-streams/)                         | How to execute a task and visualize changes using streams within a native application.                                                                                                        |
+| [SPCS Easy Run Mode](./spcs-easy-run-mode/)                   | An easy-to-use UI that helps users start their SPCS service in a few clicks after they have completed the onboarding process.                                                                 |
 
 ## Contributing
 

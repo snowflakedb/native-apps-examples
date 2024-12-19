@@ -13,7 +13,9 @@ SESSION_TOKEN_PATH = "/snowflake/session/token"
 WORKDIR = "/app"
 LIBPATH = WORKDIR + "/libs/"
 TEMPLATE_PATH = "/app/docker_template"
-SOURCEDIR = "/app/src" # fix it as /app/src currently, must mount @stage content to /app/src
+SOURCEDIR = (
+    "/app/src"  # fix it as /app/src currently, must mount @stage content to /app/src
+)
 
 IMAGE_REGISTRY_URL = os.getenv("IMAGE_REGISTRY_URL")
 SKIP_SSL = os.getenv("SKIP_SSL")
@@ -24,7 +26,7 @@ LAUNCH_CMD = os.getenv("LAUNCH_CMD", '["python3", "service.py"]')
 # the location of the build context, please set it to the directory of the target dockerfile
 BUILDDIR = os.getenv("BUILD_DIR", WORKDIR)
 # default timeout to fetch the token file
-TOKEN_FILE_TIMEOUT = os.getenv("TOKEN_FILE_TIMEOUT", '60')
+TOKEN_FILE_TIMEOUT = os.getenv("TOKEN_FILE_TIMEOUT", "60")
 
 if not os.path.exists(BUILDDIR):
     os.makedirs(BUILDDIR)
@@ -72,6 +74,7 @@ def generate_registry_cred():
     with open(REGISTRY_CRED_PATH, "w") as file:
         file.write(registry_cred)
 
+
 def generate_dockerfile():
     # Generate the Dockerfile based on the user input passed
     context = {
@@ -87,9 +90,10 @@ def generate_dockerfile():
         # Normal mode: only generate the Dockerfile from a fixed template
         logger.info(f"Generating the Dockerfile from a template")
         util.substitute_template_values(TEMPLATE_PATH, dest_path, context)
-    
+
     with open(dest_path, encoding="utf-8") as file:
         logger.info(f"Dockerfile content: {file.read()}")
+
 
 def run_kaniko():
     logger.info(f"Context path: {BUILDDIR}")
@@ -139,12 +143,12 @@ if __name__ == "__main__":
         # removed the rm command and we need to remove the symlink for kaniko to work
 
         # check the mount stage path BUILDDIR
-        
+
         if os.path.exists(TEMPLATE_PATH):
             logger.info(f"Template file exists: {TEMPLATE_PATH}")
             with open(TEMPLATE_PATH, encoding="utf-8") as file:
                 logger.info(f"Template file content: {file.read()}")
-        
+
         # simplfy the environment
         util.remove_path("/usr/lib/terminfo")
 
