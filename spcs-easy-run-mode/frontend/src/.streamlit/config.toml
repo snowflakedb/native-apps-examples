@@ -1,0 +1,9 @@
+[theme]
+primaryColor = "#249edc"       # Snowflake blue
+backgroundColor = "#f6f9fa"   # Light gray
+secondaryBackgroundColor = "#ecf1f5"  # White background for panels
+textColor = "#2e3c47"          # Dark gray for text
+font = "sans serif"            # Use modern sans-serif fonts
+
+[ui]
+hideTopBar = true
