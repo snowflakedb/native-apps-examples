@@ -32,45 +32,28 @@ In this example, we have created two Application Package entities in the definit
 
 For this example, we will demonstrate creating and versioning apps from distinct subdirectories in the Stage of one Application Package in snowflake using the CLI. To achieve this, we have defined two Application entities in the project definition file, each `from` one of the Application Package entities as the `target`. Notice that the `identifier` fields of the Applications are different, as to not override one another. 
 
-### Installation
+## Create a Native Application
 
 Execute the following command:
 
 ```bash
-snow app run
+snow app run --app-entity-id=app_v1
 ```
+Note that we specified the Application Entity we want to run. Application Entity `app_v1` is created from Package Entity `pkg_v1` as instructed in project definition file. All the artifacts listed in `pkg_v1` are deployed to the stage under the `stage_subdirectory`: `v1`.
 
-> [!CAUTION]
-> Note that objects with references are being created within stored procedures in [setup_script.sql](app/setup_script.sql), rather than inside user-defined functions. Because UDFs are resolved at build-time, we cannot create a UDF that uses a reference until that reference is bound.
 
-### First-time setup
+Now let's do the same for the other app:
 
-The first time you run the app (e.g. `snow app open`), you will be prompted to bind some references and add privileges before proceeding to the application's main functionality:
+```bash
+snow app run --app-entity-id=app_v2
+```
+The above command will create `app_v2` from Application Entity `pkg_v2`. All the artifacts listed in `pkg_v2` have been deployed to the stage under the `stage_subdirectory`: `v2`. 
 
-   - *table_reference*: `consumer_database.consumer_schema.table_reference`.
+## Create a Version
 
-   - *view_reference*: You must choose `consumer_database.consumer_schema.view_reference`.
+Execute the following command: 
+```bash
+snow app version create version1 --app-entity-id=app_v1
+```
+Above command will create a version from the artifacts for the selected Application Entity which are under `stage_subdirectory`: `v1` in the stage. 
 
-   - *procedure_reference*: You must choose `consumer_database.consumer_schema.procedure_reference`.
-
-   - *function_reference*: You must choose `consumer_database.consumer_schema.function_reference`.
-
-> These references and privileges are defined in [manifest.yml](app/manifest.yml).
-
-Once references are set, the UI will let you proceed to the main application.
-
-### Test the app
-
-When you are inside the app, you will see three different buttons:
-
-- *Call Udf reference*: Calls the user defined function you bound previously.
-
-- *Call Procedure reference*: Calls the stored procedure previously binded in the setup.
-
-- *Insert rows*: Insert a new row into the table previously binded in the setup. The dataframe is populated with the binded view.
-
-### Additional Resources
-
-- [Request references and object-level privileges from consumers](https://docs.snowflake.com/en/developer-guide/native-apps/requesting-refs)
-- [Create a user interface to request privileges and references](https://docs.snowflake.com/en/developer-guide/native-apps/requesting-ui)
-- [Access control privileges](https://docs.snowflake.com/en/user-guide/security-access-control-privileges)
