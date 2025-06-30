@@ -1,0 +1,20 @@
+manifest_version: 2
+
+roles:
+  - VIEWER:
+      comment: "The viewer role with only access to one view"
+  - ANALYST:
+      comment: "The analyst role with only access to both view and table"
+
+shared_content:
+  databases:
+    - SNAF_POPULATION_DB:
+        schemas:
+          - DATA_SCHEMA:
+              roles: [VIEWER, ANALYST]
+              tables:
+                - COUNTRY_POP_BY_YEAR:
+                    roles: [ANALYST]
+              views:
+                - COUNTRY_POP_BY_YEAR_2000:
+                    roles: [VIEWER, ANALYST]
