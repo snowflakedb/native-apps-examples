@@ -55,7 +55,7 @@ manifest_version: 2
 
 roles:
   - VIEWER:
-      comment: "The viewer role with only access to one view"
+      comment: "The viewer role with access to only one view"
   - ANALYST:
       comment: "The analyst role with access to both the view and the table"
 
