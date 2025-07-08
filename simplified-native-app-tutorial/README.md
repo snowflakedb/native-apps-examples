@@ -93,7 +93,7 @@ roles:
   - VIEWER:
       comment: "The viewer role with access to one view and one notebook"
   - ANALYST:
-      comment: "The analyst role with only access to both view and table"
+      comment: "The analyst role with access to the view, the table, and both the notebooks"
 
 shared_content:
   databases:
