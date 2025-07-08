@@ -6,7 +6,7 @@ For more information about it please visit **[this page](https://docs.snowflake.
 
 ## Data preparation
 
-To run this example first execute this command, that is going to create a databases, tables, and views with information about country populations:
+To run this example first execute this command, that is going to create databases, tables, and views with information about country populations:
 ```sh
 snow sql -f 'scripts/provider_data.sql'
 ```
