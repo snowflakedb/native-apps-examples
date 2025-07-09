@@ -2,7 +2,7 @@
 
 This is a tutorial on how to build simplified native applications.
 
-For more information about it please visit **[this page](https://docs.snowflake.com/)**.
+For more information about it please visit **[this page]([https://other-docs.snowflake.com/](https://staging.docs.snowflake.com/LIMITEDACCESS/simpleapps/index))**.
 
 ## Data preparation
 
