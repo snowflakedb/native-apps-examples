@@ -29,6 +29,7 @@ Some applications require other account-level setup before they can be properly 
 | [SPCS Three-tier](./spcs-three-tier/) | A simple three-tiered web app that can be deployed in Snowpark Container Services. It queries the TPC-H 100 data set and returns the top sales clerks. |
 | [Snowflake Cortex](./snowflake-cortex/) | A simple example on how to implement the Cortex Complete and to make it interact with user data. |
 | [Tasks and Streams](./tasks-streams/) | How to execute a task and visualize changes using streams within a native application. |
+| [Simplifiled Native Application Framework](./simplified-native-app-tutorial/) | How to create and publish a simplified native application with declarative sharing. |
 
 ## Contributing
 

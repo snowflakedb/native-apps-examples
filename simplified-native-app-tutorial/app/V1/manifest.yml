@@ -1,0 +1,9 @@
+manifest_version: 2
+
+shared_content:
+  databases:
+    - SNAF_POPULATION_DB:
+        schemas:
+          - DATA_SCHEMA:
+              views:
+                - COUNTRY_POP_BY_YEAR_2000:
