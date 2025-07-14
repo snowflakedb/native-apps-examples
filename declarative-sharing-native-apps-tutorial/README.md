@@ -1,8 +1,8 @@
-# Simplified Native Application Framework
+# Declarative Sharing in Native Application Framework
 
-This is a tutorial on how to build simplified native applications.
+This is a tutorial on how to build native applications using declarative sharing.
 
-For more information about it please visit **[this page]([https://other-docs.snowflake.com/](https://staging.docs.snowflake.com/LIMITEDACCESS/simpleapps/index))**.
+For more information about it please visit **[this page]([https://other-docs.snowflake.com/LIMITEDACCESS/simpleapps/index)**.
 
 ## Data preparation
 
