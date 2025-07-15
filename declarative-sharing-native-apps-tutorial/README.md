@@ -2,7 +2,7 @@
 
 This is a tutorial on how to build native applications using declarative sharing.
 
-For more information about it please visit **[this page]([https://other-docs.snowflake.com/LIMITEDACCESS/simpleapps/index)**.
+For more information about it please visit **[this page]([https://other-docs.snowflake.com/LIMITEDACCESS/simpleapps/index])**.
 
 ## Data preparation
 
