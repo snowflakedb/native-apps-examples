@@ -1,10 +1,10 @@
 manifest_version: 1
 version:
-  name: V1
+  name: v1
   label: "First Version"
 
 configuration:
-  grant_callback: v1.create_services
+  grant_callback: versioned_schema.create_services
 
 artifacts:
   setup_script: setup.sql
@@ -21,7 +21,7 @@ artifacts:
       - /spcs_app/napp/img_repo/eap_router
 
 lifecycle_callbacks:
-    version_initializer: v1.init
+    version_initializer: versioned_schema.init
 
 privileges:
   - BIND SERVICE ENDPOINT:
@@ -40,13 +40,13 @@ references:
         - SELECT
       object_type: VIEW
       multi_valued: false
-      register_callback: v1.register_single_callback
+      register_callback: versioned_schema.register_single_callback
   
   - WIKIPEDIA_EAI:
       label: "Wikipedia Access Integration"
       description: "EAI for Egress from NA+SPCS"
       privileges: [USAGE]
       object_type: EXTERNAL_ACCESS_INTEGRATION
-      register_callback: v1.register_single_callback
-      configuration_callback: v1.get_configuration
+      register_callback: versioned_schema.register_single_callback
+      configuration_callback: versioned_schema.get_configuration
       required_at_setup: true
