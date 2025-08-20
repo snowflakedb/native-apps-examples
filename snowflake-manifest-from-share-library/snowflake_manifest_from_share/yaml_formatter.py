@@ -1,5 +1,5 @@
 """
-YAML formatter for Snowflake share analysis results.
+YAML formatter for Snowflake application manifests.
 """
 
 import yaml
@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 
 class YAMLFormatter:
-    """Formats share analysis results into YAML output."""
+    """Formats application manifest data into YAML output."""
     
     def __init__(self, indent: int = 2, sort_keys: bool = True):
         """
@@ -48,12 +48,12 @@ class YAMLFormatter:
         self.indent = indent
         self.sort_keys = sort_keys
     
-    def format_analysis(self, analysis_result: Dict[str, Any]) -> str:
+    def format_manifest(self, manifest_data: Dict[str, Any]) -> str:
         """
-        Format the share analysis into YAML.
+        Format the application manifest into YAML.
         
         Args:
-            analysis_result: Dictionary containing share analysis results
+            manifest_data: Dictionary containing application manifest data
             
         Returns:
             YAML formatted string
@@ -61,7 +61,7 @@ class YAMLFormatter:
         try:
             # Use custom dumper with thread-safe representers
             yaml_output = yaml.dump(
-                analysis_result,
+                manifest_data,
                 Dumper=CustomYAMLDumper,
                 default_flow_style=False,
                 indent=self.indent,
@@ -75,15 +75,15 @@ class YAMLFormatter:
             logger.error(f"Error formatting to YAML: {e}")
             raise
     
-    def save_to_file(self, analysis_result: Dict[str, Any], filename: str) -> None:
+    def save_to_file(self, manifest_data: Dict[str, Any], filename: str) -> None:
         """
-        Save analysis results to a YAML file.
+        Save application manifest to a YAML file.
         
         Args:
-            analysis_result: Dictionary containing share analysis results
+            manifest_data: Dictionary containing application manifest data
             filename: Output filename
         """
-        yaml_content = self.format_analysis(analysis_result)
+        yaml_content = self.format_manifest(manifest_data)
         
         try:
             with open(filename, 'w', encoding='utf-8') as f:

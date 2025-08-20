@@ -79,7 +79,7 @@ results = generator.analyze_share('MY_DATA_SHARE')
 
 # Format to YAML
 formatter = YAMLFormatter()
-yaml_output = formatter.format_analysis(results)
+yaml_output = formatter.format_manifest(results)
 print(yaml_output)
 
 # Save to file
@@ -91,7 +91,7 @@ connection.close()
 
 ## Output Format
 
-The analysis results are structured in YAML format with a hierarchical representation:
+The generated manifest is structured in YAML format with a hierarchical representation:
 
 ```yaml
 manifest_version: 2
@@ -163,7 +163,7 @@ python3 -m pytest tests/test_connection.py -v
 
 The test suite includes:
 - **Connection tests**: URL parsing, authentication methods, connection handling
-- **Manifest generation tests**: Share analysis, database role processing, YAML structure generation
+- **Manifest generation tests**: Share processing, database role handling, YAML structure generation
 - **YAML formatting tests**: Flow style lists, empty values, file operations  
 - **CLI tests**: Argument parsing, error handling, output formatting
 

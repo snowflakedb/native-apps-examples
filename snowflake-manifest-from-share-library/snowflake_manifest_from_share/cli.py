@@ -119,9 +119,9 @@ Examples:
     parser.add_argument('--role',
                        help='Snowflake role to use')
     
-    # Analysis parameters
+    # Manifest generation parameters
     parser.add_argument('--share', required=True,
-                       help='Name of the data share to analyze')
+                       help='Name of the data share to generate manifest from')
     parser.add_argument('--output', '-o',
                        help='Output YAML file (default: print to stdout)')
     
@@ -156,7 +156,7 @@ Examples:
         
         # Generate manifest
         logger.info(f"Generating manifest for share: {args.share}")
-        analysis_result = generator.analyze_share(args.share)
+        manifest_result = generator.analyze_share(args.share)
         
         # Format results
         formatter = YAMLFormatter(
@@ -166,21 +166,21 @@ Examples:
         
         if args.output:
             # Save to file
-            formatter.save_to_file(analysis_result, args.output)
-            logger.info(f"Analysis complete. Results saved to: {args.output}")
+            formatter.save_to_file(manifest_result, args.output)
+            logger.info(f"Manifest generation complete. Results saved to: {args.output}")
         else:
             # Print to stdout
-            yaml_output = formatter.format_analysis(analysis_result)
+            yaml_output = formatter.format_manifest(manifest_result)
             print(yaml_output)
         
         # Close connection
         connection.close()
         
     except KeyboardInterrupt:
-        logger.info("Analysis interrupted by user")
+        logger.info("Manifest generation interrupted by user")
         sys.exit(1)
     except Exception as e:
-        logger.error(f"Analysis failed: {e}")
+        logger.error(f"Manifest generation failed: {e}")
         if args.verbose:
             logger.exception("Full traceback:")
         sys.exit(1)

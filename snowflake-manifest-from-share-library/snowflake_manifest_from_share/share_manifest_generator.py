@@ -1,5 +1,5 @@
 """
-Core functionality for analyzing Snowflake data shares.
+Core functionality for generating application manifests from Snowflake data shares.
 """
 
 from typing import Dict, List, Any, Optional
@@ -71,15 +71,15 @@ class ShareManifestGenerator:
     
     def analyze_share(self, share_name: str) -> Dict[str, Any]:
         """
-        Analyze a data share and return structured shared content information.
+        Generate application manifest from a data share.
         
         Args:
-            share_name: Name of the data share to analyze
+            share_name: Name of the data share to generate manifest from
             
         Returns:
-            Dictionary containing structured share content
+            Dictionary containing application manifest data
         """
-        logger.info(f"Starting analysis of data share: {share_name}")
+        logger.info(f"Starting manifest generation from data share: {share_name}")
         
         # Get all grants to the share
         grants = self._get_share_grants(share_name)
@@ -95,14 +95,14 @@ class ShareManifestGenerator:
         shared_content, role_mappings = self._build_shared_content_structure(all_grants)
         roles_section = self._build_roles_section(role_info)
         
-        analysis_result = {
+        manifest_result = {
             'manifest_version': 2,
             'roles': roles_section,
             'shared_content': shared_content
         }
         
-        logger.info(f"Completed analysis of data share: {share_name}")
-        return analysis_result
+        logger.info(f"Completed manifest generation from data share: {share_name}")
+        return manifest_result
     
     def _get_share_grants(self, share_name: str) -> List[Dict[str, Any]]:
         """Get all grants to the data share."""
