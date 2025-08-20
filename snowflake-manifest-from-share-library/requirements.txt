@@ -1,0 +1,2 @@
+snowflake-connector-python>=2.7.0
+PyYAML>=6.0
