@@ -8,7 +8,7 @@ import logging
 import sys
 import os
 from typing import Optional
-from .connection import SnowflakeConnection
+from .connection import SnowflakeConnection, _secure_read_private_key
 from .share_manifest_generator import ShareManifestGenerator
 from .yaml_formatter import YAMLFormatter
 
@@ -50,8 +50,8 @@ def get_connection_from_args(args) -> SnowflakeConnection:
         connection_params['password'] = args.password
     elif args.private_key_path:
         try:
-            with open(args.private_key_path, 'r') as f:
-                connection_params['private_key'] = f.read()
+            # Use secure private key reading function
+            connection_params['private_key'] = _secure_read_private_key(args.private_key_path)
         except Exception as e:
             logging.error(f"Failed to read private key file: {e}")
             sys.exit(1)

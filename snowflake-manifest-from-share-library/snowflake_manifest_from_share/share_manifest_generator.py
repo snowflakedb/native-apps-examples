@@ -4,10 +4,57 @@ Core functionality for analyzing Snowflake data shares.
 
 from typing import Dict, List, Any, Optional
 import logging
+import re
 from .connection import SnowflakeConnection
 from .yaml_formatter import EmptyValue, FlowStyleList
 
 logger = logging.getLogger(__name__)
+
+
+def _validate_identifier(identifier: str, context: str = "identifier") -> str:
+    """
+    Validate and sanitize Snowflake identifiers to prevent SQL injection.
+    
+    Args:
+        identifier: The identifier to validate
+        context: Context for error messages
+        
+    Returns:
+        Validated identifier
+        
+    Raises:
+        ValueError: If identifier is invalid
+    """
+    if not identifier or not isinstance(identifier, str):
+        raise ValueError(f"Invalid {context}: must be a non-empty string")
+    
+    # Remove whitespace
+    identifier = identifier.strip()
+    
+    # Check for SQL injection patterns
+    dangerous_patterns = [
+        r'[;\'"\\]',  # Semicolon, quotes, backslash
+        r'\b(DROP|DELETE|INSERT|UPDATE|ALTER|CREATE|TRUNCATE)\b',  # SQL keywords
+        r'--',  # SQL comments
+        r'/\*',  # SQL block comments
+        r'\bOR\b.*\b1\s*=\s*1\b',  # Common injection pattern
+        r'\bUNION\b',  # Union attacks
+    ]
+    
+    for pattern in dangerous_patterns:
+        if re.search(pattern, identifier, re.IGNORECASE):
+            raise ValueError(f"Invalid {context}: contains dangerous characters or keywords")
+    
+    # Validate against Snowflake identifier rules (simplified)
+    # Allow alphanumeric, underscore, dot (for qualified names), and dollar sign
+    if not re.match(r'^[A-Za-z0-9_.$-]+$', identifier):
+        raise ValueError(f"Invalid {context}: contains invalid characters")
+    
+    # Length check (Snowflake max identifier length is 255)
+    if len(identifier) > 255:
+        raise ValueError(f"Invalid {context}: too long (max 255 characters)")
+    
+    return identifier
 
 
 class ShareManifestGenerator:
@@ -59,8 +106,11 @@ class ShareManifestGenerator:
     
     def _get_share_grants(self, share_name: str) -> List[Dict[str, Any]]:
         """Get all grants to the data share."""
+        # Validate share name to prevent SQL injection
+        validated_share_name = _validate_identifier(share_name, "share name")
+        
         query = f"""
-        SHOW GRANTS TO SHARE {share_name}
+        SHOW GRANTS TO SHARE {validated_share_name}
         """
         
         try:
@@ -104,8 +154,11 @@ class ShareManifestGenerator:
             role_info[role_short_name] = self._get_role_info(role_name)
             
             # Get role grants
+            # Validate role name to prevent SQL injection
+            validated_role_name = _validate_identifier(role_name, "database role name")
+            
             query = f"""
-            SHOW GRANTS TO DATABASE ROLE {role_name}
+            SHOW GRANTS TO DATABASE ROLE {validated_role_name}
             """
             
             try:
@@ -135,8 +188,11 @@ class ShareManifestGenerator:
         else:
             return {}
         
+        # Validate database name to prevent SQL injection
+        validated_db_name = _validate_identifier(db_name, "database name")
+        
         query = f"""
-        SHOW DATABASE ROLES IN DATABASE {db_name}
+        SHOW DATABASE ROLES IN DATABASE {validated_db_name}
         """
         
         try:

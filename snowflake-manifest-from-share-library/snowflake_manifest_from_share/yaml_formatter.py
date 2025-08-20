@@ -15,6 +15,10 @@ class FlowStyleList:
     def __init__(self, items):
         self.items = items
 
+class CustomYAMLDumper(yaml.SafeDumper):
+    """Custom YAML dumper with thread-safe representers."""
+    pass
+
 def represent_empty_value(dumper, data):
     """Custom YAML representer for empty values."""
     return dumper.represent_scalar('tag:yaml.org,2002:null', '')
@@ -22,6 +26,10 @@ def represent_empty_value(dumper, data):
 def represent_flow_style_list(dumper, data):
     """Custom YAML representer for flow style lists."""
     return dumper.represent_sequence('tag:yaml.org,2002:seq', data.items, flow_style=True)
+
+# Register representers on custom dumper class (thread-safe)
+CustomYAMLDumper.add_representer(EmptyValue, represent_empty_value)
+CustomYAMLDumper.add_representer(FlowStyleList, represent_flow_style_list)
 
 logger = logging.getLogger(__name__)
 
@@ -51,12 +59,10 @@ class YAMLFormatter:
             YAML formatted string
         """
         try:
-            # Register custom representers
-            yaml.add_representer(EmptyValue, represent_empty_value)
-            yaml.add_representer(FlowStyleList, represent_flow_style_list)
-            
+            # Use custom dumper with thread-safe representers
             yaml_output = yaml.dump(
                 analysis_result,
+                Dumper=CustomYAMLDumper,
                 default_flow_style=False,
                 indent=self.indent,
                 sort_keys=self.sort_keys,

@@ -3,11 +3,69 @@ Snowflake connection handler.
 """
 
 import snowflake.connector
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Union
 import logging
+import os
 from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
+
+
+def _secure_read_private_key(private_key_path: str) -> bytes:
+    """
+    Securely read private key file as bytes.
+    
+    Args:
+        private_key_path: Path to private key file
+        
+    Returns:
+        Private key content as bytes
+        
+    Raises:
+        FileNotFoundError: If file doesn't exist
+        PermissionError: If insufficient permissions
+        ValueError: If file is empty or invalid
+    """
+    if not os.path.exists(private_key_path):
+        raise FileNotFoundError(f"Private key file not found: {private_key_path}")
+    
+    # Check file permissions (should not be world-readable)
+    file_stat = os.stat(private_key_path)
+    if file_stat.st_mode & 0o077:  # Check if group/other have any permissions
+        logger.warning(f"Private key file {private_key_path} has overly permissive permissions")
+    
+    try:
+        with open(private_key_path, 'rb') as f:
+            key_content = f.read()
+        
+        if not key_content:
+            raise ValueError(f"Private key file is empty: {private_key_path}")
+        
+        return key_content
+    except Exception as e:
+        logger.error(f"Failed to read private key file {private_key_path}: {e}")
+        raise
+
+
+def _validate_credential_security(password: Optional[str], private_key: Optional[Union[str, bytes]]) -> None:
+    """
+    Validate credential security parameters.
+    
+    Args:
+        password: Password string
+        private_key: Private key content
+        
+    Raises:
+        ValueError: If credentials are insecure
+    """
+    if password and private_key:
+        raise ValueError("Cannot specify both password and private key authentication")
+    
+    if not password and not private_key:
+        raise ValueError("Must specify either password or private key authentication")
+    
+    if password and len(password) < 8:
+        logger.warning("Password is shorter than 8 characters, consider using a stronger password")
 
 
 class SnowflakeConnection:
@@ -45,7 +103,7 @@ class SnowflakeConnection:
                  account: str,
                  user: str,
                  password: Optional[str] = None,
-                 private_key: Optional[str] = None,
+                 private_key: Optional[Union[str, bytes]] = None,
                  private_key_passphrase: Optional[str] = None,
                  authenticator: str = 'snowflake',
                  warehouse: Optional[str] = None,
@@ -59,7 +117,7 @@ class SnowflakeConnection:
             account: Snowflake account identifier or full URL
             user: Username for authentication
             password: Password (if using password auth)
-            private_key: Private key for key-pair authentication
+            private_key: Private key content as string or bytes (if using key-pair auth)
             private_key_passphrase: Passphrase for private key
             authenticator: Authentication method
             warehouse: Default warehouse
@@ -67,6 +125,9 @@ class SnowflakeConnection:
             schema: Default schema
             role: Default role
         """
+        # Validate credential security
+        _validate_credential_security(password, private_key)
+        
         # Parse account from URL if needed
         parsed_account = self._parse_account_from_url(account)
         
@@ -80,7 +141,11 @@ class SnowflakeConnection:
             self.connection_params['password'] = password
         
         if private_key:
-            self.connection_params['private_key'] = private_key
+            # Ensure private key is in bytes format for security
+            if isinstance(private_key, str):
+                self.connection_params['private_key'] = private_key.encode('utf-8')
+            else:
+                self.connection_params['private_key'] = private_key
         
         if private_key_passphrase:
             self.connection_params['private_key_passphrase'] = private_key_passphrase
