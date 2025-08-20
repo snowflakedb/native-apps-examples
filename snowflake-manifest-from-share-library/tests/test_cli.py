@@ -190,7 +190,7 @@ class TestCLI:
         # Mock return values
         test_result = {'manifest_version': 2, 'test': 'data'}
         mock_generator.analyze_share.return_value = test_result
-        mock_formatter.format_analysis.return_value = 'yaml: output'
+        mock_formatter.format_manifest.return_value = 'yaml: output'
 
         # Capture stdout
         captured_output = io.StringIO()
@@ -203,7 +203,7 @@ class TestCLI:
         # Verify calls
         mock_generator_class.assert_called_once_with(mock_connection)
         mock_generator.analyze_share.assert_called_once_with('TEST_SHARE')
-        mock_formatter.format_analysis.assert_called_once_with(test_result)
+        mock_formatter.format_manifest.assert_called_once_with(test_result)
         mock_connection.close.assert_called_once()
 
         # Verify output

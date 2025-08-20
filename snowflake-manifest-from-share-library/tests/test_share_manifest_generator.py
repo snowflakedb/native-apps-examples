@@ -25,7 +25,7 @@ class TestShareManifestGenerator:
         assert generator.connection == mock_connection
 
     def test_analyze_share_basic_structure(self, generator, mock_connection):
-        """Test basic share analysis with simple structure."""
+        """Test basic manifest generation with simple structure."""
         # Mock the share grants response
         mock_connection.execute_query_dict.side_effect = [
             # SHOW GRANTS TO SHARE response
@@ -72,7 +72,7 @@ class TestShareManifestGenerator:
         assert 'TEST_TABLE' in tables[0]
 
     def test_analyze_share_with_database_role(self, generator, mock_connection):
-        """Test share analysis with database role."""
+        """Test manifest generation with database role."""
         mock_connection.execute_query_dict.side_effect = [
             # SHOW GRANTS TO SHARE response
             [
@@ -116,7 +116,7 @@ class TestShareManifestGenerator:
         assert 'TEST_ROLE' in databases[0]['TEST_DB']['roles'].items
 
     def test_analyze_share_with_views(self, generator, mock_connection):
-        """Test share analysis with views."""
+        """Test manifest generation with views."""
         mock_connection.execute_query_dict.side_effect = [
             # SHOW GRANTS TO SHARE response
             [
@@ -147,7 +147,7 @@ class TestShareManifestGenerator:
         assert 'TEST_VIEW' in views[0]
 
     def test_analyze_share_empty_response(self, generator, mock_connection):
-        """Test share analysis with empty response."""
+        """Test manifest generation with empty response."""
         mock_connection.execute_query_dict.return_value = []
 
         result = generator.analyze_share('EMPTY_SHARE')

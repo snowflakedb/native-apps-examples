@@ -23,7 +23,7 @@ class TestYAMLFormatter:
         assert formatter.indent == 4
         assert formatter.sort_keys == False
 
-    def test_format_analysis_basic(self):
+    def test_format_manifest_basic(self):
         """Test basic YAML formatting."""
         formatter = YAMLFormatter()
         data = {
@@ -34,13 +34,13 @@ class TestYAMLFormatter:
             }
         }
 
-        result = formatter.format_analysis(data)
+        result = formatter.format_manifest(data)
 
         # Verify it's valid YAML
         parsed = yaml.safe_load(result)
         assert parsed == data
 
-    def test_format_analysis_with_roles(self):
+    def test_format_manifest_with_roles(self):
         """Test YAML formatting with roles."""
         formatter = YAMLFormatter()
         data = {
@@ -54,14 +54,14 @@ class TestYAMLFormatter:
             }
         }
 
-        result = formatter.format_analysis(data)
+        result = formatter.format_manifest(data)
 
         # Verify the YAML contains the expected structure
         assert 'DR1:' in result
         assert 'comment: Test role' in result
         assert 'DR2:' in result
 
-    def test_format_analysis_with_flow_style_lists(self):
+    def test_format_manifest_with_flow_style_lists(self):
         """Test YAML formatting with flow style lists."""
         formatter = YAMLFormatter()
         data = {
@@ -92,13 +92,13 @@ class TestYAMLFormatter:
             }
         }
 
-        result = formatter.format_analysis(data)
+        result = formatter.format_manifest(data)
 
         # Verify flow style is used for roles
         assert 'roles: [ROLE1, ROLE2]' in result
         assert 'roles: [ROLE1]' in result
 
-    def test_format_analysis_with_empty_values(self):
+    def test_format_manifest_with_empty_values(self):
         """Test YAML formatting with empty values."""
         formatter = YAMLFormatter()
         data = {
@@ -123,7 +123,7 @@ class TestYAMLFormatter:
             }
         }
 
-        result = formatter.format_analysis(data)
+        result = formatter.format_manifest(data)
 
         # Verify empty values render correctly (just key with colon)
         assert 'EMPTY_ROLE:' in result
@@ -132,7 +132,7 @@ class TestYAMLFormatter:
         assert 'EMPTY_ROLE: null' not in result
         assert 'EMPTY_VIEW: null' not in result
 
-    def test_format_analysis_indentation(self):
+    def test_format_manifest_indentation(self):
         """Test YAML formatting with custom indentation."""
         formatter = YAMLFormatter(indent=4)
         data = {
@@ -148,7 +148,7 @@ class TestYAMLFormatter:
             }
         }
 
-        result = formatter.format_analysis(data)
+        result = formatter.format_manifest(data)
 
         # Verify 4-space indentation is used
         lines = result.split('\n')
@@ -156,7 +156,7 @@ class TestYAMLFormatter:
             if line.startswith('    '):  # 4 spaces
                 assert not line.startswith('  ') or line.startswith('    ')
 
-    def test_format_analysis_no_sort_keys(self):
+    def test_format_manifest_no_sort_keys(self):
         """Test YAML formatting without sorting keys."""
         formatter = YAMLFormatter(sort_keys=False)
         data = {
@@ -165,7 +165,7 @@ class TestYAMLFormatter:
             'manifest_version': 2
         }
 
-        result = formatter.format_analysis(data)
+        result = formatter.format_manifest(data)
 
         # The order should be preserved (not alphabetical)
         lines = [line.strip() for line in result.split('\n') if line.strip()]
@@ -209,15 +209,15 @@ class TestYAMLFormatter:
         with pytest.raises(Exception):
             formatter.save_to_file(data, '/invalid/path/file.yml')
 
-    def test_format_analysis_error_handling(self):
-        """Test error handling in format_analysis."""
+    def test_format_manifest_error_handling(self):
+        """Test error handling in format_manifest."""
         # Test with a mock that raises an exception
         with patch('snowflake_manifest_from_share.yaml_formatter.yaml.dump', side_effect=Exception("YAML error")):
             formatter = YAMLFormatter()
             data = {'test': 'data'}
 
             with pytest.raises(Exception, match="YAML error"):
-                formatter.format_analysis(data)
+                formatter.format_manifest(data)
 
     def test_real_world_manifest_structure(self):
         """Test formatting a realistic manifest structure."""
@@ -263,7 +263,7 @@ class TestYAMLFormatter:
             }
         }
 
-        result = formatter.format_analysis(data)
+        result = formatter.format_manifest(data)
 
         # Verify the structure is correct
         parsed = yaml.safe_load(result)

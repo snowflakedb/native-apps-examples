@@ -88,7 +88,7 @@ class YAMLFormatter:
         try:
             with open(filename, 'w', encoding='utf-8') as f:
                 f.write(yaml_content)
-            logger.info(f"Analysis results saved to: {filename}")
+            logger.info(f"Application manifest saved to: {filename}")
         except Exception as e:
             logger.error(f"Error saving to file {filename}: {e}")
             raise
