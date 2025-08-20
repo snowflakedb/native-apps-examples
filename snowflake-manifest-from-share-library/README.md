@@ -171,4 +171,4 @@ Current test coverage: **51 tests with 93% code coverage**
 
 ## License
 
-MIT License
+Apache License 2.0
