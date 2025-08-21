@@ -80,7 +80,7 @@ class TestSnowflakeConnection:
             private_key="test_private_key",
             private_key_passphrase="test_passphrase"
         )
-        assert conn.connection_params['private_key'] == "test_private_key"
+        assert conn.connection_params['private_key'] == b"test_private_key"
         assert conn.connection_params['private_key_passphrase'] == "test_passphrase"
         assert 'password' not in conn.connection_params
 
