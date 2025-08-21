@@ -244,15 +244,10 @@ class ShareManifestGenerator:
                 
                 if role:
                     role_mappings['databases'][db_name].add(role)
-        
-        # Also track database roles from DATABASE_ROLE grants
-        for grant_data in grants:
-            grant = grant_data['grant']
-            role = grant_data['role']
             
-            if (grant.get('granted_on') == 'DATABASE_ROLE' and 
-                grant.get('privilege') == 'USAGE' and 
-                grant.get('name')):
+            elif (grant.get('granted_on') == 'DATABASE_ROLE' and 
+                  grant.get('privilege') == 'USAGE' and 
+                  grant.get('name')):
                 full_name = grant.get('name')
                 if '.' in full_name:
                     db_name = full_name.split('.')[0]
