@@ -3,7 +3,7 @@ name: native-apps-examples-testing
 channels:
   - snowflake
 dependencies:
-  - python=3.8
+  - python=3.10
   - pip
   - pip:
       - git+https://github.com/snowflakedb/snowflake-telemetry-python.git
