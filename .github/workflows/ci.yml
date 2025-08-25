@@ -109,13 +109,15 @@ jobs:
           if [ -z "${args}" ] || [ -z "${pythonpath}" ]; then
             echo “Nothing to test”
           else
+            echo "Running pytest with args: $args"
             pytest $args
             ret=$?
-            echo $ret
+            echo "Pytest exit code: $ret"
             if [ "$ret" -eq 5 ]; then
-              echo "No tests collected."
+              echo "No tests collected - converting to success"
               exit 0
             fi
+            echo "Exiting with code: $ret"
             exit "$ret"
           fi
         
