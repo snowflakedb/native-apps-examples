@@ -110,6 +110,7 @@ jobs:
             echo “Nothing to test”
           else
             echo "Running pytest with args: $args"
+            echo "Python path: $pythonpath"
             pytest $args
             ret=$?
             echo "Pytest exit code: $ret"
