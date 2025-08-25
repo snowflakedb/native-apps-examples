@@ -2,13 +2,19 @@
 name: native-apps-examples-testing
 channels:
   - snowflake
+  - conda-forge
 dependencies:
   - python=3.10
   - pip
+  - numpy=1.26.4
+  - pandas=2.2.2
+  - scikit-learn=1.3.2
   - pip:
+      - snowflake-telemetry-python==0.7.1
       - snowflake-native-apps-permission-stub==0.1.11
       - snowflake-snowpark-python==1.33.0
       - snowflake-cli-labs==3.10.1
       - pytest==8.4.1
       - streamlit==1.48.1
+      - snowflake-ml-python==1.6.4
 
