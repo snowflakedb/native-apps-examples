@@ -104,18 +104,22 @@ jobs:
               python -m pip install pytest
       - name: Run tests
         run: |
+          set +e  # Don't exit on non-zero return codes
           args="${{ steps.tests_to_run.outputs.pytestArgs }}"
           pythonpath="${{ steps.tests_to_run.outputs.pytestPaths }}"
           if [ -z "${args}" ] || [ -z "${pythonpath}" ]; then
-            echo “Nothing to test”
+            echo "Nothing to test"
           else
+            echo "Running pytest with args: $args"
+            echo "Python path: $pythonpath"
             pytest $args
             ret=$?
-            echo $ret
-            if [ "$ret" = 5 ]; then
-              echo "No tests collected."
+            echo "Pytest exit code: $ret"
+            if [ "$ret" -eq 5 ]; then
+              echo "No tests collected - converting to success"
               exit 0
             fi
+            echo "Exiting with code: $ret"
             exit "$ret"
           fi
         

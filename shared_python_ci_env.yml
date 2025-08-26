@@ -6,11 +6,10 @@ dependencies:
   - python=3.8
   - pip
   - pip:
-      - git+https://github.com/snowflakedb/snowflake-telemetry-python.git
-      - snowflake-native-apps-permission-stub
+      - snowflake-telemetry-python>=0.7.1
+      - snowflake-native-apps-permission-stub>=0.1.7
       - snowflake-snowpark-python>=1.15.0
       - snowflake-cli-labs>=2.0.0
-      - pytest
+      - pytest>=7.4.0
       - streamlit>=1.26.0
-      - snowflake-ml-python
-
+      - snowflake-ml-python>=1.0.0
