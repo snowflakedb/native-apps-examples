@@ -1,0 +1,50 @@
+name: native-app-examples-integration
+
+on: [ pull_request, push ]
+
+permissions:
+  contents: read
+
+jobs:          
+  build:
+    runs-on: ubuntu-latest
+    env:
+        SNOWFLAKE_CONNECTIONS_DEFAULT_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+        SNOWFLAKE_CONNECTIONS_DEFAULT_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+        SNOWFLAKE_CONNECTIONS_DEFAULT_USER: ${{ secrets.SNOWFLAKE_USER }}
+        SNOWFLAKE_CONNECTIONS_DEFAULT_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+        SNOWFLAKE_CONNECTIONS_DEFAULT_WAREHOSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
+      - name: Get modified apps
+        id: modified-apps-step
+        uses: ./.github/actions/modified_apps
+      - name: Set up Snowflake CLI
+        uses: Snowflake-Labs/snowflake-cli-action@v1.1
+        with:
+          cli-version: "latest"
+          default-config-file-path: "config.toml"
+      - name: Verify Snowflake Connection
+        run: |
+            snow --version
+            snow connection test
+      - name: Run Integration
+        run: |
+            set -e
+            modified_apps=${{ steps.modified-apps-step.outputs.modified_apps }}
+            IFS=',' read -ra modified_apps_array <<< "$modified_apps"
+            for app in "${modified_apps_array[@]}"; do
+                cd $app
+                if [ -f ci.sh ]; then 
+                    sh ci.sh
+                else
+                   snow app run
+                   snow app teardown
+                fi
+                cd ..
+            done
