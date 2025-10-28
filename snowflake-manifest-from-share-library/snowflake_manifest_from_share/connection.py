@@ -7,24 +7,27 @@ from typing import Optional, Dict, Any, Union
 import logging
 import os
 from urllib.parse import urlparse
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
 
 logger = logging.getLogger(__name__)
 
 
-def _secure_read_private_key(private_key_path: str) -> bytes:
+def _secure_read_private_key(private_key_path: str, passphrase: Optional[str] = None) -> bytes:
     """
-    Securely read private key file as bytes.
+    Securely read and decrypt private key file.
     
     Args:
         private_key_path: Path to private key file
+        passphrase: Optional passphrase for encrypted keys
         
     Returns:
-        Private key content as bytes
+        Decrypted private key content in DER format as bytes
         
     Raises:
         FileNotFoundError: If file doesn't exist
         PermissionError: If insufficient permissions
-        ValueError: If file is empty or invalid
+        ValueError: If file is empty, invalid, or passphrase is incorrect
     """
     if not os.path.exists(private_key_path):
         raise FileNotFoundError(f"Private key file not found: {private_key_path}")
@@ -41,7 +44,21 @@ def _secure_read_private_key(private_key_path: str) -> bytes:
         if not key_content:
             raise ValueError(f"Private key file is empty: {private_key_path}")
         
-        return key_content
+        password_bytes = passphrase.encode('utf-8') if passphrase else None
+        
+        private_key = serialization.load_pem_private_key(
+            key_content,
+            password=password_bytes,
+            backend=default_backend()
+        )
+        
+        key_der = private_key.private_bytes(
+            encoding=serialization.Encoding.DER,
+            format=serialization.PrivateFormat.PKCS8,
+            encryption_algorithm=serialization.NoEncryption()
+        )
+        
+        return key_der
     except Exception as e:
         logger.error(f"Failed to read private key file {private_key_path}: {e}")
         raise
@@ -104,7 +121,6 @@ class SnowflakeConnection:
                  user: str,
                  password: Optional[str] = None,
                  private_key: Optional[Union[str, bytes]] = None,
-                 private_key_passphrase: Optional[str] = None,
                  authenticator: str = 'snowflake',
                  warehouse: Optional[str] = None,
                  database: Optional[str] = None,
@@ -117,8 +133,7 @@ class SnowflakeConnection:
             account: Snowflake account identifier or full URL
             user: Username for authentication
             password: Password (if using password auth)
-            private_key: Private key content as string or bytes (if using key-pair auth)
-            private_key_passphrase: Passphrase for private key
+            private_key: Decrypted private key content in DER format as bytes (if using key-pair auth)
             authenticator: Authentication method
             warehouse: Default warehouse
             database: Default database
@@ -146,9 +161,6 @@ class SnowflakeConnection:
                 self.connection_params['private_key'] = private_key.encode('utf-8')
             else:
                 self.connection_params['private_key'] = private_key
-        
-        if private_key_passphrase:
-            self.connection_params['private_key_passphrase'] = private_key_passphrase
             
         if warehouse:
             self.connection_params['warehouse'] = warehouse

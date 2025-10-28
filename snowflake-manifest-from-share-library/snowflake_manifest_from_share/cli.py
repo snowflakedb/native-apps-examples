@@ -50,14 +50,14 @@ def get_connection_from_args(args) -> SnowflakeConnection:
         connection_params['password'] = args.password
     elif args.private_key_path:
         try:
-            # Use secure private key reading function
-            connection_params['private_key'] = _secure_read_private_key(args.private_key_path)
+            # Use secure private key reading function with passphrase if provided
+            connection_params['private_key'] = _secure_read_private_key(
+                args.private_key_path,
+                args.private_key_passphrase
+            )
         except Exception as e:
             logging.error(f"Failed to read private key file: {e}")
             sys.exit(1)
-        
-        if args.private_key_passphrase:
-            connection_params['private_key_passphrase'] = args.private_key_passphrase
     
     if args.warehouse:
         connection_params['warehouse'] = args.warehouse

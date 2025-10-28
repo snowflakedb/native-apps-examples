@@ -77,11 +77,9 @@ class TestSnowflakeConnection:
         conn = SnowflakeConnection(
             account="myaccount",
             user="testuser",
-            private_key="test_private_key",
-            private_key_passphrase="test_passphrase"
+            private_key=b"test_private_key"
         )
         assert conn.connection_params['private_key'] == b"test_private_key"
-        assert conn.connection_params['private_key_passphrase'] == "test_passphrase"
         assert 'password' not in conn.connection_params
 
     def test_init_with_optional_params(self):
