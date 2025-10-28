@@ -322,7 +322,6 @@ class ShareManifestGenerator:
         database_list = []
         for db_name, db_content in databases.items():
             schema_list = []
-            db_roles = list(role_mappings['databases'].get(db_name, set()))
             
             for schema_name, schema_content in db_content['schemas'].items():
                 schema_key = f"{db_name}.{schema_name}"
@@ -360,13 +359,7 @@ class ShareManifestGenerator:
                 
                 schema_list.append(schema_dict)
             
-            db_dict = {db_name: {}}
-            
-            # Add database roles if there are any
-            if db_roles:
-                db_dict[db_name]['roles'] = FlowStyleList(db_roles)
-                
-            db_dict[db_name]['schemas'] = schema_list
+            db_dict = {db_name: {'schemas': schema_list}}
             database_list.append(db_dict)
         
         return {'databases': database_list}, role_mappings
