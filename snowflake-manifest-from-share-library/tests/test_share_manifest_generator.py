@@ -111,9 +111,11 @@ class TestShareManifestGenerator:
         assert 'TEST_ROLE' in result['roles'][0]
         assert result['roles'][0]['TEST_ROLE']['comment'] == 'Test role comment'
 
-        # Verify database has role
+        # Verify database structure (databases should not have roles)
         databases = result['shared_content']['databases']
-        assert 'TEST_ROLE' in databases[0]['TEST_DB']['roles'].items
+        assert 'TEST_DB' in databases[0]
+        assert 'roles' not in databases[0]['TEST_DB']
+        assert 'schemas' in databases[0]['TEST_DB']
 
     def test_analyze_share_with_views(self, generator, mock_connection):
         """Test manifest generation with views."""
@@ -301,9 +303,10 @@ class TestShareManifestGenerator:
         assert 'DR1' in result['roles'][0]
         assert result['roles'][0]['DR1']['comment'] == 'Demo role'
 
-        # Verify database has DR1 role
+        # Verify database structure (databases should not have roles)
         db = result['shared_content']['databases'][0]['DEMO_DB']
-        assert 'DR1' in db['roles'].items
+        assert 'roles' not in db
+        assert 'schemas' in db
 
         # Verify schema has DR1 role  
         schema = db['schemas'][0]['ANALYTICS']
