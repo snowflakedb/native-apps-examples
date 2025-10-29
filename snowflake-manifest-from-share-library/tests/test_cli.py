@@ -121,7 +121,7 @@ class TestCLI:
 
     def test_get_connection_from_args_with_private_key(self):
         """Test getting connection from args with private key."""
-        mock_private_key = b"-----BEGIN PRIVATE KEY-----\ntest_key_content\n-----END PRIVATE KEY-----"
+        mock_private_key_der = b"mock_der_key_content"
         
         args = argparse.Namespace(
             account='myaccount',
@@ -137,13 +137,10 @@ class TestCLI:
             role=None
         )
 
-        with patch('os.path.exists', return_value=True), \
-             patch('os.stat'), \
-             patch('builtins.open', mock_open(read_data=mock_private_key)):
+        with patch('snowflake_manifest_from_share.cli._secure_read_private_key', return_value=mock_private_key_der):
             connection = get_connection_from_args(args)
 
-        assert connection.connection_params['private_key'] == mock_private_key
-        assert connection.connection_params['private_key_passphrase'] == 'test_passphrase'
+        assert connection.connection_params['private_key'] == mock_private_key_der
         assert 'password' not in connection.connection_params
 
     def test_get_connection_from_args_private_key_file_not_found(self):

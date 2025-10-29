@@ -42,6 +42,9 @@ snowflake-manifest-from-share --account https://myaccount.snowflakecomputing.com
 # Using private key authentication
 snowflake-manifest-from-share --host myaccount.region.cloud.snowflakecomputing.com --user myuser --private-key-path /path/to/key.pem --share MYSHARE
 
+# Using private key authentication with passphrase (passphrase must be in double quotes)
+snowflake-manifest-from-share --host myaccount.region.cloud.snowflakecomputing.com --user myuser --private-key-path /path/to/key.pem --private-key-passphrase "your_passphrase" --share MYSHARE
+
 # Save output to file
 snowflake-manifest-from-share --host myaccount.region.cloud.snowflakecomputing.com --user myuser --password mypass --share MYSHARE --output manifest.yml
 
@@ -136,7 +139,8 @@ The structure includes:
 The library supports multiple authentication methods:
 
 1. **Password authentication**: Provide `--password`
-2. **Private key authentication**: Provide `--private-key-path` (and optionally `--private-key-passphrase`)
+2. **Private key authentication**: Provide `--private-key-path` (and optionally `--private-key-passphrase` for encrypted keys)
+   - **Note**: When using `--private-key-passphrase`, the passphrase must be enclosed in double quotes
 
 ## Development
 
