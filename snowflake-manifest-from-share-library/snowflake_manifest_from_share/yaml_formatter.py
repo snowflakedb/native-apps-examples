@@ -17,7 +17,10 @@ class FlowStyleList:
 
 class CustomYAMLDumper(yaml.SafeDumper):
     """Custom YAML dumper with thread-safe representers."""
-    pass
+    
+    def increase_indent(self, flow=False, indentless=False):
+        """Override to add proper indentation for list items."""
+        return super(CustomYAMLDumper, self).increase_indent(flow, False)
 
 def represent_empty_value(dumper, data):
     """Custom YAML representer for empty values."""
