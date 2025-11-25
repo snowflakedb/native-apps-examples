@@ -1,0 +1,1 @@
+/Users/mxu/native-apps-examples/echo-app/app/support.sql

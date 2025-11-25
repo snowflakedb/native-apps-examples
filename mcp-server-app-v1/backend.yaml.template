@@ -1,0 +1,8 @@
+spec:
+  containers:
+    - name: mcp-backend
+      image: <<REPOSITORY>>/mcp_backend
+  endpoints:
+    - name: api
+      port: 8080
+      public: true

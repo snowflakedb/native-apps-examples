@@ -1,0 +1,30 @@
+manifest_version: 1
+version:
+  name: V1
+  label: "First Version"
+
+configuration:
+  grant_callback: v1.create_services
+
+artifacts:
+  setup_script: setup.sql
+  readme: README.md
+
+  default_web_endpoint:
+    service: app_public.backend
+    endpoint: api
+
+  container_services:
+    images:
+      - /mcp_server_app_v1/napp/img_repo/mcp_backend
+
+lifecycle_callbacks:
+  version_initializer: v1.init
+
+privileges:
+  - BIND SERVICE ENDPOINT:
+      description: "Ability to create ingress URLs."
+      required_at_setup: true
+  - CREATE COMPUTE POOL:
+      required_at_setup: true
+      description: "Enable application to create its own compute pool(s)"

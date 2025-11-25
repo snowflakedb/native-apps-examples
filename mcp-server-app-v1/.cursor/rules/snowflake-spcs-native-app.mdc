@@ -1,0 +1,274 @@
+---
+description: Guide for developing Snowflake SPCS Native Apps with MCP SERVER support
+globs:
+alwaysApply: false
+---
+
+# Snowflake SPCS Native App with MCP SERVER Development
+
+This rule applies when building Snowflake Native Apps with Snowpark Container Services (SPCS), especially those exposing MCP SERVER endpoints.
+
+## When to Apply This Rule
+
+Apply when the user mentions:
+- "native app" + "Snowflake"
+- "SPCS" or "Snowpark Container Services"
+- "container services" + "Snowflake"
+- "MCP server" + "Snowflake"
+- Building an app to run in Snowflake
+- Hosting a service (MCP server, API, web app) in Snowflake
+
+## Reference Project
+
+Use `/Users/mxu/native-apps-examples/mcp-server-app-v1/` as the reference implementation. Read `SPCS_NATIVE_APP_DEVELOPMENT_GUIDE.md` for complete details.
+
+## Project Structure Template
+
+```
+mcp-server-app-v1/
+├── app/                          # Deployed to Snowflake
+│   ├── manifest.yml              # App privileges, endpoints, callbacks
+│   ├── setup.sql                 # Roles, schemas, procedures, MCP SERVER
+│   ├── support.sql               # Debug procedures
+│   ├── backend.yaml              # Service spec (generated from template)
+│   └── README.md
+├── backend/
+│   ├── Dockerfile
+│   └── src/
+│       ├── app.py                # Flask application with service function endpoints
+│       ├── entrypoint.sh
+│       └── requirements.txt
+├── prepare/
+│   ├── provider_setup.sql
+│   └── consumer_setup.sql
+├── scripts/
+│   └── setup_shared_content.sql
+├── snowflake.yml                 # Snowflake CLI project definition
+├── Makefile.template
+├── backend.yaml.template
+├── setup.sh
+└── deploy.sh
+```
+
+## Critical Files to Create
+
+### 1. `snowflake.yml`
+```yaml
+definition_version: 1
+native_app:
+  name: <app_name>
+  source_stage: napp.app_stage
+  artifacts:
+    - src: app/*
+      dest: ./
+  package:
+    name: <app_name>_pkg
+    role: naspcs_role
+    warehouse: wh_nap
+    scripts:
+      - scripts/setup_shared_content.sql
+  application:
+    name: <app_name>_instance
+    role: nac
+    warehouse: wh_nac
+```
+
+### 2. `app/manifest.yml`
+```yaml
+manifest_version: 1
+version:
+  name: V1
+  label: "Version 1"
+
+configuration:
+  grant_callback: v1.create_services
+
+artifacts:
+  setup_script: setup.sql
+  readme: README.md
+  default_web_endpoint:
+    service: app_public.backend
+    endpoint: api
+  container_services:
+    images:
+      - /app_db/napp/img_repo/<image_name>
+
+lifecycle_callbacks:
+  version_initializer: v1.init
+
+privileges:
+  - BIND SERVICE ENDPOINT:
+      description: "Create ingress URLs"
+      required_at_setup: true
+  - CREATE COMPUTE POOL:
+      required_at_setup: true
+      description: "Create compute pools"
+```
+
+### 3. `backend.yaml.template`
+```yaml
+spec:
+  containers:
+    - name: <container_name>
+      image: <<REPOSITORY>>/<image_name>
+  endpoints:
+    - name: api
+      port: 8080
+      public: true
+```
+
+### 4. Backend Dockerfile
+```dockerfile
+FROM python:3.10-slim
+EXPOSE 8080
+WORKDIR /app
+COPY src/requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
+COPY src/. .
+RUN chmod +x ./entrypoint.sh
+ENTRYPOINT ["./entrypoint.sh"]
+```
+
+## MCP SERVER Integration
+
+### Service Function
+Create a service function that calls your SPCS endpoint:
+
+```sql
+CREATE OR REPLACE FUNCTION v1.my_tool(input VARCHAR)
+RETURNS VARCHAR
+SERVICE = app_public.backend
+ENDPOINT = api
+AS '/my_endpoint';
+GRANT USAGE ON FUNCTION v1.my_tool(VARCHAR) TO APPLICATION ROLE app_user;
+```
+
+### Backend Endpoint for Service Functions
+Service functions send requests in a specific format:
+
+```python
+@app.route("/my_endpoint", methods=['POST'])
+def my_endpoint():
+    if request.is_json:
+        data = request.get_json()
+        # Service function format: {"data": [[row_num, arg1, ...], ...]}
+        if isinstance(data, dict) and 'data' in data:
+            results = []
+            for row in data['data']:
+                row_num = row[0]
+                input_val = row[1] if len(row) > 1 else ''
+                # Process input and generate result
+                result = f"Processed: {input_val}"
+                results.append([row_num, result])
+            return jsonify(data=results)
+    return jsonify(error="Invalid request")
+```
+
+### MCP SERVER Object
+Create an MCP SERVER with custom tools:
+
+```sql
+CREATE MCP SERVER IF NOT EXISTS v1.my_mcp_server
+FROM SPECIFICATION $$
+tools:
+- title: "My Tool"
+  identifier: "<app_instance>.v1.my_tool"
+  name: "my_tool"
+  type: "GENERIC"
+  description: "Description of what the tool does"
+  config:
+    type: "function"
+    warehouse: "WH_NAC"
+    input_schema:
+      type: "object"
+      properties:
+        input:
+          description: "The input parameter"
+          type: "string"
+$$;
+GRANT USAGE ON MCP SERVER v1.my_mcp_server TO APPLICATION ROLE app_user;
+```
+
+### Testing MCP REST API
+
+```bash
+# tools/list
+curl -X POST "https://<account>.snowflakecomputing.com/api/v2/databases/<app_instance>/schemas/v1/mcp-servers/<mcp_server_name>" \
+  -H "Authorization: Bearer <PAT_TOKEN>" \
+  -H "X-Snowflake-Authorization-Token-Type: PROGRAMMATIC_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+
+# tools/call
+curl -X POST "https://<account>.snowflakecomputing.com/api/v2/databases/<app_instance>/schemas/v1/mcp-servers/<mcp_server_name>" \
+  -H "Authorization: Bearer <PAT_TOKEN>" \
+  -H "X-Snowflake-Authorization-Token-Type: PROGRAMMATIC_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"my_tool","arguments":{"input":"test"}}}'
+```
+
+## Deployment Steps
+
+### 1. Get User's Snowflake Connection
+```bash
+export SNOWFLAKE_DEFAULT_CONNECTION_NAME=<connection_name>
+```
+
+### 2. Run Setup
+```bash
+./setup.sh
+# Creates roles, databases, image repository
+# Builds and pushes Docker images
+```
+
+### 3. Deploy Application
+```bash
+./deploy.sh
+# Runs: snow app run
+```
+
+### 4. Activate in Snowsight UI
+1. Open the URL printed by deploy.sh
+2. Click **Grant** for account privileges
+3. Click **Activate** to create compute pools and services
+4. Click **Launch App** to get the running URL
+
+### 5. Grant Access for PAT Users (if using MCP REST API)
+```sql
+-- Grant app roles to allow PAT access
+GRANT APPLICATION ROLE <app_instance>.app_admin TO ROLE PUBLIC;
+GRANT USAGE ON WAREHOUSE wh_nac TO ROLE PUBLIC;
+```
+
+## Compute Pool Instance Families
+- `CPU_X64_XS` - Extra small (default for lightweight services)
+- `CPU_X64_S` - Small
+- `CPU_X64_M` - Medium
+- `CPU_X64_L` - Large
+- `GPU_NV_S` - Small GPU
+- `GPU_NV_M` - Medium GPU
+
+## Troubleshooting
+
+### Connection Issues
+- Check `~/.snowflake/config.toml` for valid connections
+- Avoid connections requiring MFA for programmatic access
+
+### Image Push Failures
+```bash
+snow spcs image-registry login
+```
+
+### Service Not Starting
+```sql
+SHOW COMPUTE POOLS;
+CALL app_instance.app_public.get_service_logs('app_public.backend', 0, 'container-name', 100);
+```
+
+### MCP REST API 401/403 Errors
+- Verify PAT token is valid
+- Check app roles are granted to user's role
+- Ensure warehouse is accessible
+
+## For Complete Reference
+Read: `SPCS_NATIVE_APP_DEVELOPMENT_GUIDE.md` in this repository
