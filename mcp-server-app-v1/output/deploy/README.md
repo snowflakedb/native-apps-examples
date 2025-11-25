@@ -1,1 +1,1 @@
-/Users/mxu/native-apps-examples/echo-app/app/README.md
+/Users/mxu/native-apps-examples/mcp-server-app-v1/app/README.md

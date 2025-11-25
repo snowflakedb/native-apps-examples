@@ -1,3 +1,4 @@
+-- Application Roles and Schemas
 CREATE APPLICATION ROLE IF NOT EXISTS app_admin;
 CREATE APPLICATION ROLE IF NOT EXISTS app_user;
 CREATE SCHEMA IF NOT EXISTS app_public;
@@ -6,7 +7,7 @@ GRANT USAGE ON SCHEMA app_public TO APPLICATION ROLE app_user;
 CREATE OR ALTER VERSIONED SCHEMA v1;
 GRANT USAGE ON SCHEMA v1 TO APPLICATION ROLE app_admin;
 
--- The version initializer callback is executed after a successful installation, upgrade, or downgrade.
+-- Version initializer callback - executed after installation, upgrade, or downgrade
 CREATE OR REPLACE PROCEDURE v1.init()
 RETURNS STRING 
 LANGUAGE SQL
@@ -19,36 +20,17 @@ BEGIN
 END $$;
 GRANT USAGE ON PROCEDURE v1.init() TO APPLICATION ROLE app_admin;
 
+-- Create compute pool (privileges auto-granted with manifest v2)
+CREATE COMPUTE POOL IF NOT EXISTS mcp_compute_pool
+    MIN_NODES = 1
+    MAX_NODES = 1
+    INSTANCE_FAMILY = CPU_X64_XS;
+
 -- Start the backend service
-CREATE OR REPLACE PROCEDURE v1.start_backend(pool_name VARCHAR)
-    RETURNS string
-    LANGUAGE sql
-    AS $$
-BEGIN
-    CREATE SERVICE IF NOT EXISTS app_public.backend
-        IN COMPUTE POOL Identifier(:pool_name)
-        FROM SPECIFICATION_FILE='backend.yaml';
-    GRANT USAGE ON SERVICE app_public.backend TO APPLICATION ROLE app_user;
-END
-$$;
-GRANT USAGE ON PROCEDURE v1.start_backend(VARCHAR) TO APPLICATION ROLE app_admin;
-
--- Grant callback - called when privileges are granted
-CREATE OR REPLACE PROCEDURE v1.create_services(privileges array)
- RETURNS STRING
- LANGUAGE SQL
- AS 
- $$
-    BEGIN
-        CREATE COMPUTE POOL IF NOT EXISTS mcp_compute_pool
-        MIN_NODES = 1
-        MAX_NODES = 1
-        INSTANCE_FAMILY = CPU_X64_XS;
-
-        CALL v1.start_backend('mcp_compute_pool');
-    END;
-$$;
-GRANT USAGE ON PROCEDURE v1.create_services(array) TO APPLICATION ROLE app_admin;
+CREATE SERVICE IF NOT EXISTS app_public.backend
+    IN COMPUTE POOL mcp_compute_pool
+    FROM SPECIFICATION_FILE='backend.yaml';
+GRANT USAGE ON SERVICE app_public.backend TO APPLICATION ROLE app_user;
 
 -- Stop the app
 CREATE OR REPLACE PROCEDURE app_public.stop_app()
@@ -89,7 +71,6 @@ GRANT USAGE ON FUNCTION v1.echo(VARCHAR) TO APPLICATION ROLE app_user;
 GRANT USAGE ON FUNCTION v1.echo(VARCHAR) TO APPLICATION ROLE app_admin;
 
 -- MCP SERVER with custom tool pointing to the service function
--- Note: identifier uses fully qualified path to the service function
 CREATE MCP SERVER IF NOT EXISTS v1.echo_mcp_server
 FROM SPECIFICATION $$
 tools:

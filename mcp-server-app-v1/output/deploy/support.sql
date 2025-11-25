@@ -1,1 +1,1 @@
-/Users/mxu/native-apps-examples/echo-app/app/support.sql
+/Users/mxu/native-apps-examples/mcp-server-app-v1/app/support.sql

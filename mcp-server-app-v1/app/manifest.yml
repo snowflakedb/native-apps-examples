@@ -1,10 +1,7 @@
-manifest_version: 1
+manifest_version: 2
 version:
   name: V1
   label: "First Version"
-
-configuration:
-  grant_callback: v1.create_services
 
 artifacts:
   setup_script: setup.sql
@@ -24,7 +21,5 @@ lifecycle_callbacks:
 privileges:
   - BIND SERVICE ENDPOINT:
       description: "Ability to create ingress URLs."
-      required_at_setup: true
   - CREATE COMPUTE POOL:
-      required_at_setup: true
       description: "Enable application to create its own compute pool(s)"
