@@ -1,1 +1,0 @@
-/Users/mxu/native-apps-examples/mcp-server-app-v1/app/README.md

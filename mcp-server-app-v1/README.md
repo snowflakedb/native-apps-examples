@@ -1,6 +1,6 @@
 # Snowflake SPCS Native App with MCP SERVER - Development Guide
 
-Complete reference for developing Snowflake Native Apps with SPCS and MCP SERVER support.
+Complete reference for developing Snowflake Native Apps with SPCS and MCP SERVER support. The MCP SERVER is built with service functions as custom tools.
 
 ## Architecture
 

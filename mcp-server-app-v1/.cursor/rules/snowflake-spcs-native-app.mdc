@@ -13,7 +13,7 @@ Apply when user mentions: "native app" + "Snowflake", "SPCS", "Snowpark Containe
 ## Reference
 
 - **Project**: `/Users/mxu/native-apps-examples/mcp-server-app-v1/`
-- **Full Guide**: `SPCS_NATIVE_APP_DEVELOPMENT_GUIDE.md`
+- **Full Guide**: `README.md`
 
 ## Project Structure
 
