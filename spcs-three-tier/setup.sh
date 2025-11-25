@@ -3,7 +3,9 @@ snow sql -f "prepare/provider_setup.sql"
 snow sql -f "prepare/consumer_setup.sql"
 
 # Gets the image repository url.
-repository_url=$(snow spcs image-repository url img_repo --database spcs_app --schema napp)
+repository_url=$(snow spcs image-repository url img_repo --database spcs_app --schema napp 2>/dev/null | head -n 1 | tr -d '\r')
+# Escape characters that are special in sed replacement and ensure single-line value
+safe_repository_url=$(printf '%s' "$repository_url" | sed -e 's/[&|\\]/\\&/g')
 
 # Paths to the files
 makefile="./Makefile"
@@ -18,8 +20,8 @@ cp $frontend_yaml_template $frontend_yaml
 cp $backend_yaml_template $backend_yaml
 
 # Replace placeholders in Makefile file using | as delimiter
-sed -i "" "s|<<REPOSITORY>>|$repository_url|g" $makefile
-sed -i "" "s|<<REPOSITORY>>|$repository_url|g" $frontend_yaml
-sed -i "" "s|<<REPOSITORY>>|$repository_url|g" $backend_yaml
+sed -i "" "s|<<REPOSITORY>>|$safe_repository_url|g" $makefile
+sed -i "" "s|<<REPOSITORY>>|$safe_repository_url|g" $frontend_yaml
+sed -i "" "s|<<REPOSITORY>>|$safe_repository_url|g" $backend_yaml
 
 make all
