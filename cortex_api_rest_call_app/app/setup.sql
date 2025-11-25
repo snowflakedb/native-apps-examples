@@ -1,0 +1,84 @@
+-- Application Roles and Schemas
+CREATE APPLICATION ROLE IF NOT EXISTS app_admin;
+CREATE APPLICATION ROLE IF NOT EXISTS app_user;
+CREATE SCHEMA IF NOT EXISTS app_public;
+GRANT USAGE ON SCHEMA app_public TO APPLICATION ROLE app_admin;
+GRANT USAGE ON SCHEMA app_public TO APPLICATION ROLE app_user;
+CREATE OR ALTER VERSIONED SCHEMA v1;
+GRANT USAGE ON SCHEMA v1 TO APPLICATION ROLE app_admin;
+
+-- Version initializer callback - executed after installation, upgrade, or downgrade
+CREATE OR REPLACE PROCEDURE v1.init()
+RETURNS STRING 
+LANGUAGE SQL
+EXECUTE AS OWNER 
+AS
+$$
+BEGIN    
+    ALTER SERVICE IF EXISTS app_public.backend FROM SPECIFICATION_FILE='backend.yaml';
+    RETURN 'init complete';
+END $$;
+GRANT USAGE ON PROCEDURE v1.init() TO APPLICATION ROLE app_admin;
+
+-- Create compute pool (privileges auto-granted with manifest v2)
+CREATE COMPUTE POOL IF NOT EXISTS cortex_compute_pool
+    MIN_NODES = 1
+    MAX_NODES = 1
+    INSTANCE_FAMILY = CPU_X64_XS;
+
+-- Start the backend service
+CREATE SERVICE IF NOT EXISTS app_public.backend
+    IN COMPUTE POOL cortex_compute_pool
+    FROM SPECIFICATION_FILE='backend.yaml';
+GRANT USAGE ON SERVICE app_public.backend TO APPLICATION ROLE app_user;
+
+-- Stop the app
+CREATE OR REPLACE PROCEDURE app_public.stop_app()
+    RETURNS string
+    LANGUAGE sql
+    AS
+$$
+BEGIN
+    DROP SERVICE IF EXISTS app_public.backend;
+END
+$$;
+GRANT USAGE ON PROCEDURE app_public.stop_app() TO APPLICATION ROLE app_admin;
+
+-- Get the app URL
+CREATE OR REPLACE PROCEDURE v1.app_url()
+    RETURNS string
+    LANGUAGE sql
+    AS
+$$
+DECLARE
+    ingress_url VARCHAR;
+BEGIN
+    SHOW ENDPOINTS IN SERVICE app_public.backend;
+    SELECT "ingress_url" INTO :ingress_url FROM TABLE (RESULT_SCAN (LAST_QUERY_ID())) LIMIT 1;
+    RETURN ingress_url;
+END
+$$;
+GRANT USAGE ON PROCEDURE v1.app_url() TO APPLICATION ROLE app_admin;
+GRANT USAGE ON PROCEDURE v1.app_url() TO APPLICATION ROLE app_user;
+
+-- Service function that calls the Cortex complete endpoint
+CREATE OR REPLACE FUNCTION v1.cortex_complete(prompt VARCHAR, model VARCHAR)
+RETURNS VARCHAR
+SERVICE = app_public.backend
+ENDPOINT = api
+AS '/cortex/complete';
+GRANT USAGE ON FUNCTION v1.cortex_complete(VARCHAR, VARCHAR) TO APPLICATION ROLE app_user;
+GRANT USAGE ON FUNCTION v1.cortex_complete(VARCHAR, VARCHAR) TO APPLICATION ROLE app_admin;
+
+-- Convenience function with default model
+CREATE OR REPLACE FUNCTION v1.cortex_complete(prompt VARCHAR)
+RETURNS VARCHAR
+SERVICE = app_public.backend
+ENDPOINT = api
+AS '/cortex/complete';
+GRANT USAGE ON FUNCTION v1.cortex_complete(VARCHAR) TO APPLICATION ROLE app_user;
+GRANT USAGE ON FUNCTION v1.cortex_complete(VARCHAR) TO APPLICATION ROLE app_admin;
+
+-- Support functions
+EXECUTE IMMEDIATE FROM 'support.sql';
+

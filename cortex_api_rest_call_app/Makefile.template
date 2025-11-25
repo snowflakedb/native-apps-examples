@@ -1,0 +1,18 @@
+SNOWFLAKE_REPO?=<<REPOSITORY>>
+BACKEND_IMAGE=cortex_backend
+
+help:           ## Show this help.
+	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
+
+all: login build push
+
+login:          ## Login to Snowflake Docker repo
+	snow spcs image-registry login
+
+build:          ## Build Docker image for Snowpark Container Services
+	cd backend && docker build --platform linux/amd64 -t $(BACKEND_IMAGE) . && cd ..
+
+push:           ## Push Docker image to Snowpark Container Services
+	docker tag $(BACKEND_IMAGE) $(SNOWFLAKE_REPO)/$(BACKEND_IMAGE)
+	docker push $(SNOWFLAKE_REPO)/$(BACKEND_IMAGE)
+

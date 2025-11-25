@@ -1,0 +1,26 @@
+manifest_version: 2
+version:
+  name: V1
+  label: "First Version"
+
+artifacts:
+  setup_script: setup.sql
+  readme: README.md
+
+  default_web_endpoint:
+    service: app_public.backend
+    endpoint: api
+
+  container_services:
+    images:
+      - /cortex_api_rest_call_app/napp/img_repo/cortex_backend
+
+lifecycle_callbacks:
+  version_initializer: v1.init
+
+privileges:
+  - BIND SERVICE ENDPOINT:
+      description: "Ability to create ingress URLs."
+  - CREATE COMPUTE POOL:
+      description: "Enable application to create its own compute pool(s)"
+

@@ -1,0 +1,9 @@
+spec:
+  containers:
+    - name: cortex-backend
+      image: <<REPOSITORY>>/cortex_backend
+  endpoints:
+    - name: api
+      port: 8080
+      public: true
+

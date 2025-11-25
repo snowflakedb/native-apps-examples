@@ -1,0 +1,115 @@
+---
+description: Guide for developing Snowflake SPCS Native Apps
+globs:
+alwaysApply: false
+---
+
+# Snowflake SPCS Native App Development
+
+## When to Apply
+
+Apply when user mentions: "native app" + "Snowflake", "SPCS", "Snowpark Container Services", or hosting services in Snowflake.
+
+## Reference Projects
+
+- **MCP Server App**: `/Users/mxu/native-apps-examples/mcp-server-app-v1/`
+- **Cortex API App**: `/Users/mxu/native-apps-examples/cortex_api_rest_call_app/`
+
+## Project Structure
+
+```
+my-app/
+├── app/
+│   ├── manifest.yml          # Privileges, endpoints, callbacks
+│   ├── setup.sql             # Roles, procedures, services
+│   └── README.md
+├── backend/
+│   ├── Dockerfile
+│   └── src/app.py
+├── prepare/
+│   ├── provider_setup.sql
+│   └── consumer_setup.sql
+├── snowflake.yml             # CLI project definition
+├── backend.yaml.template
+├── setup.sh
+└── deploy.sh
+```
+
+## Essential Patterns
+
+### snowflake.yml
+```yaml
+definition_version: 1
+native_app:
+  name: <app_name>
+  source_stage: napp.app_stage
+  artifacts:
+    - src: app/*
+      dest: ./
+  package:
+    name: <app_name>_pkg
+    role: naspcs_role
+    warehouse: wh_nap
+  application:
+    name: <app_name>_instance
+    role: nac
+    warehouse: wh_nac
+```
+
+### Manifest V2 (Auto-Granted Privileges)
+```yaml
+manifest_version: 2
+version:
+  name: V1
+  label: "First Version"
+
+artifacts:
+  setup_script: setup.sql
+  readme: README.md
+
+privileges:
+  - CREATE COMPUTE POOL:
+      description: "Create compute pools"
+  - BIND SERVICE ENDPOINT:
+      description: "Public ingress"
+```
+
+### Service Function (SQL → HTTP)
+```sql
+CREATE FUNCTION v1.my_tool(input VARCHAR)
+RETURNS VARCHAR
+SERVICE = app_public.backend
+ENDPOINT = api
+AS '/my_endpoint';
+```
+
+### Backend Handler (for service functions)
+```python
+@app.route("/my_endpoint", methods=['POST'])
+def handler():
+    data = request.get_json()
+    if 'data' in data:  # Service function format
+        results = [[row[0], f"Result: {row[1]}"] for row in data['data']]
+        return jsonify(data=results)
+```
+
+### SPCS OAuth Token (for calling Snowflake APIs)
+```python
+def get_snowflake_token():
+    with open('/snowflake/session/token', 'r') as f:
+        return f.read()
+
+headers = {
+    "Authorization": f'Snowflake Token="{get_snowflake_token()}"',
+    "Content-Type": "application/json"
+}
+```
+
+## Deployment
+
+```bash
+export SNOWFLAKE_DEFAULT_CONNECTION_NAME=<connection>
+./setup.sh    # Creates resources, builds/pushes Docker
+./deploy.sh   # Runs: snow app run
+# Then in Snowsight: Grant → Activate → Launch App
+```

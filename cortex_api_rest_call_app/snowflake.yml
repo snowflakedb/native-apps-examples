@@ -1,0 +1,19 @@
+# Snowflake Native App Project Definition
+definition_version: 1
+native_app:
+  name: cortex_api_rest_call_app
+  source_stage: napp.app_stage
+  artifacts:
+    - src: app/*
+      dest: ./
+  package:
+    name: cortex_api_rest_call_app_pkg
+    role: naspcs_role
+    warehouse: wh_nap
+    scripts:
+      - scripts/setup_shared_content.sql
+  application:
+    name: cortex_api_rest_call_app_instance
+    role: nac
+    warehouse: wh_nac
+
