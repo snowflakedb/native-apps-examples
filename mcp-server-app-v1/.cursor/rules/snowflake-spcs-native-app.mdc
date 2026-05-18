@@ -1,0 +1,134 @@
+---
+description: Guide for developing Snowflake SPCS Native Apps with MCP SERVER support
+globs:
+alwaysApply: false
+---
+
+# Snowflake SPCS Native App Development
+
+## When to Apply
+
+Apply when user mentions: "native app" + "Snowflake", "SPCS", "Snowpark Container Services", "MCP server" + "Snowflake", or hosting services in Snowflake.
+
+## Reference
+
+- **Project**: `/Users/mxu/native-apps-examples/mcp-server-app-v1/`
+- **Full Guide**: `README.md`
+
+## Project Structure
+
+```
+my-app/
+├── app/
+│   ├── manifest.yml          # Privileges, endpoints, callbacks
+│   ├── setup.sql             # Roles, procedures, MCP SERVER
+│   └── README.md
+├── backend/
+│   ├── Dockerfile
+│   └── src/app.py
+├── prepare/
+│   ├── provider_setup.sql
+│   └── consumer_setup.sql
+├── snowflake.yml             # CLI project definition
+├── backend.yaml.template
+├── setup.sh
+└── deploy.sh
+```
+
+## Essential Patterns
+
+### snowflake.yml
+```yaml
+definition_version: 1
+native_app:
+  name: <app_name>
+  source_stage: napp.app_stage
+  artifacts:
+    - src: app/*
+      dest: ./
+  package:
+    name: <app_name>_pkg
+    role: naspcs_role
+    warehouse: wh_nap
+  application:
+    name: <app_name>_instance
+    role: nac
+    warehouse: wh_nac
+```
+
+### Manifest V2 (Auto-Granted Privileges)
+```yaml
+manifest_version: 2
+version:
+  name: V1
+  label: "First Version"
+
+artifacts:
+  setup_script: setup.sql
+  readme: README.md
+
+privileges:
+  - CREATE COMPUTE POOL:
+      description: "Create compute pools"
+  - BIND SERVICE ENDPOINT:
+      description: "Public ingress"
+```
+
+### Service Function (SQL → HTTP)
+```sql
+CREATE FUNCTION v1.my_tool(input VARCHAR)
+RETURNS VARCHAR
+SERVICE = app_public.backend
+ENDPOINT = api
+AS '/my_endpoint';
+```
+
+### Backend Handler (for service functions)
+```python
+@app.route("/my_endpoint", methods=['POST'])
+def handler():
+    data = request.get_json()
+    if 'data' in data:  # Service function format
+        results = [[row[0], f"Result: {row[1]}"] for row in data['data']]
+        return jsonify(data=results)
+```
+
+### MCP SERVER
+```sql
+CREATE MCP SERVER v1.my_mcp_server
+FROM SPECIFICATION $$
+tools:
+- title: "My Tool"
+  identifier: "<app_instance>.v1.my_tool"
+  name: "my_tool"
+  type: "GENERIC"
+  description: "Tool description"
+  config:
+    type: "function"
+    warehouse: "WH_NAC"
+    input_schema:
+      type: "object"
+      properties:
+        input:
+          type: "string"
+$$;
+```
+
+## Deployment
+
+```bash
+export SNOWFLAKE_DEFAULT_CONNECTION_NAME=<connection>
+./setup.sh    # Creates resources, builds/pushes Docker
+./deploy.sh   # Runs: snow app run
+# Then in Snowsight: Grant → Activate → Launch App
+```
+
+## MCP REST API Auth
+
+```bash
+curl -X POST "https://<account>.snowflakecomputing.com/api/v2/databases/<app>/schemas/v1/mcp-servers/<server>" \
+  -H "Authorization: Bearer <PAT>" \
+  -H "X-Snowflake-Authorization-Token-Type: PROGRAMMATIC_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+```

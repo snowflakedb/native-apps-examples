@@ -1,0 +1,18 @@
+# Snowflake Native App Project Definition
+definition_version: 1
+native_app:
+  name: mcp_server_app_v1
+  source_stage: napp.app_stage
+  artifacts:
+    - src: app/*
+      dest: ./
+  package:
+    name: mcp_server_app_v1_pkg
+    role: naspcs_role
+    warehouse: wh_nap
+    scripts:
+      - scripts/setup_shared_content.sql
+  application:
+    name: mcp_server_app_v1_instance
+    role: nac
+    warehouse: wh_nac
