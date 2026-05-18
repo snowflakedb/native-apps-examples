@@ -14,7 +14,7 @@ Make sure you already have a warehouse and it is used in the current connection.
 CREATE WAREHOUSE IF NOT EXISTS provider_warehouse;
 ```
 
-Execute the [setup.sql](prepare/setup.sql) file as the `ACCOUNTADMIN` role. This script sets up the table that is going to be shared:
+Execute the [provider.sql](prepare/provider.sql) file as the `ACCOUNTADMIN` role. This script sets up the table that is going to be shared:
 
 ```bash
 snow sql -f 'prepare/provider.sql'
