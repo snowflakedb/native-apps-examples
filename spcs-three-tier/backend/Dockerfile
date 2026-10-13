@@ -1,10 +1,11 @@
-FROM python:3.10
+FROM python:3.10-slim-bookworm@sha256:5be5aaecb962a41567bc8041f1e9e3432cb085b037fe057f9a562630b2e4b370
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 EXPOSE 8081
 WORKDIR /app
 COPY src/requirements.txt .
-RUN pip3 install -r requirements.txt
-RUN pip3 uninstall oscrypto -y
-RUN pip3 install oscrypto@git+https://github.com/wbond/oscrypto.git@d5f3437ed24257895ae1edd9e503cfb352e635a8
-COPY src/. .
+RUN python -m pip install --require-hashes --only-binary=:all: --no-cache-dir -r requirements.txt
+RUN useradd --uid 10001 --create-home appuser
+COPY --chown=10001:10001 src/. .
 RUN chmod +x ./entrypoint.sh
-ENTRYPOINT [ "./entrypoint.sh" ]
+USER appuser
+ENTRYPOINT ["./entrypoint.sh"]

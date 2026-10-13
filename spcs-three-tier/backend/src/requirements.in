@@ -1,0 +1,6 @@
+# Runtime inputs. Regenerate requirements.txt with the command in README.md.
+snowflake-connector-python>=4.8.0,<5
+snowflake-snowpark-python
+pandas
+numpy
+flask

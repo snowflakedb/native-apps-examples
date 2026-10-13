@@ -58,6 +58,30 @@ The setup script runs the following scripts:
 - Consumer side setup (`consumer_setup.sql`)
 - Image repository setup by executing `make all` command
 
+### Dependency and image verification
+
+The backend installs only pinned wheels whose SHA-256 hashes appear in
+`backend/src/requirements.txt`. Its Python base image is pinned by digest,
+and it runs as an unprivileged user. `datetime` comes from Python's standard
+library; no third-party package or unhashed Git install supplies it.
+
+To update the lock, review the resolved versions, then regenerate and rebuild:
+
+```bash
+uv pip compile backend/src/requirements.in --python-version 3.10 \
+  --python-platform x86_64-unknown-linux-gnu --generate-hashes \
+  --no-emit-index-url --no-header -o backend/src/requirements.txt
+docker build --platform linux/amd64 -t eap_backend backend
+```
+
+After all images are pushed, setup renders the service specifications and
+Native App manifest from the digests Docker recorded for those exact images.
+A missing or mismatched digest aborts rendering. Deployment uses `@sha256`
+references, so changing a registry tag cannot change the deployed image.
+Rerun setup after rebuilding; keep registry write access restricted to trusted
+builders. Hashes ensure reproducibility and integrity, not that a dependency
+is free of vulnerabilities. Review dependency and base-image updates regularly.
+
 ### Deploy application package
 
 Run the following command in your opened terminal:
@@ -86,12 +110,12 @@ The second step creates a new `EXTERNAL ACCESS INTEGRATION` targeting the `uploa
 
 #### Activate the application
 
-Once all the steps are completed, you can activate the application by clicking the `Activate` button. When the button is clicked, the `grant_callback` defined in the [manifest.yml](app/manifest.yml) is executed.
+Once all the steps are completed, you can activate the application by clicking the `Activate` button. When the button is clicked, the `grant_callback` defined in the [manifest template](manifest.yml.template) is executed.
 In this example, our callback creates two `COMPUTE POOL`s in the account and two `SERVICE`s inside of the application object.
 
 #### Launch Application
 
-Once all these dependencies have been met, you can launch the app by clicking on the `Launch App` button. A new window will be displayed with the URL provided by the service and endpoint defined by `default_web_endpoint` in the [manifest.yml](app/manifest.yml).
+Once all these dependencies have been met, you can launch the app by clicking on the `Launch App` button. A new window will be displayed with the URL provided by the service and endpoint defined by `default_web_endpoint` in the [manifest template](manifest.yml.template).
 
 #### Cleanup
 To clean up the Native App test install, you can execute `cleanup.sh`, which will stop the services and run `snow app teardown`:

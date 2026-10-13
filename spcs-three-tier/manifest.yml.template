@@ -16,9 +16,9 @@ artifacts:
 
   container_services:
     images:
-      - /spcs_app/napp/img_repo/eap_frontend
-      - /spcs_app/napp/img_repo/eap_backend
-      - /spcs_app/napp/img_repo/eap_router
+      - <<FRONTEND_IMAGE>>
+      - <<BACKEND_IMAGE>>
+      - <<ROUTER_IMAGE>>
 
 lifecycle_callbacks:
     version_initializer: v1.init

@@ -1,11 +1,11 @@
 spec:
   containers:
     - name: eap-frontend
-      image: <<REPOSITORY>>/eap_frontend
+      image: <<FRONTEND_IMAGE>>
       env:
         VUE_APP_API_URL: /api/snowpark
     - name: eap-router
-      image: <<REPOSITORY>>/eap_router
+      image: <<ROUTER_IMAGE>>
       env:
         FE_SERVER: localhost:8080
         BE_SERVER: backend:8081

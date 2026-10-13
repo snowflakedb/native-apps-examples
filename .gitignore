@@ -7,3 +7,7 @@ Makefile
 na_spcs_python/na_spcs_python/v1/frontend.yaml
 na_spcs_python/na_spcs_python/v1/backend.yaml
 CLAUDE.md
+
+/spcs-three-tier/app/backend.yaml
+/spcs-three-tier/app/frontend.yaml
+/spcs-three-tier/app/manifest.yml
