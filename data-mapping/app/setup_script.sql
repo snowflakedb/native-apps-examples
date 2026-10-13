@@ -96,7 +96,10 @@ RETURNS number
 AS
 $$
     DECLARE 
-        q VARCHAR DEFAULT 'UPDATE REFERENCE(''tabletouse'') SET ' || out_field || ' = ENRICHIP.ip2data(' || inp_field || ')';
+        -- Treat each name as one identifier, including embedded quotes or dots.
+        input_identifier VARCHAR DEFAULT '"' || REPLACE(inp_field, '"', '""') || '"';
+        output_identifier VARCHAR DEFAULT '"' || REPLACE(out_field, '"', '""') || '"';
+        q VARCHAR DEFAULT 'UPDATE REFERENCE(''tabletouse'') SET ' || output_identifier || ' = ENRICHIP.ip2data(' || input_identifier || ')';
         result INTEGER DEFAULT 0;
     BEGIN
         EXECUTE IMMEDIATE q;
