@@ -43,6 +43,22 @@ the Frontend, which is typically pretty light.
 
     Replacing `<your_connection>` with you actual connection name, without the `<>`.
 
+### Bootstrap role ownership
+
+Run setup as `ACCOUNTADMIN`. The fixed demo roles `NASPCS_ROLE` and `NAC`
+are reused only when owned by `ACCOUNTADMIN` and granted solely to that role.
+Setup stops before granting privileges if either role has another owner or
+is granted to another role or user. It never takes over or replaces existing
+roles. Have an account administrator inspect a conflicting role before retrying.
+Use a dedicated demo account rather than sharing these roles with other users.
+
+The provider role can create the example database and application package.
+The consumer role can install the app, create its sample database and external
+access integration, and approve compute pool and endpoint privileges for the
+app. Those last two privileges retain `WITH GRANT OPTION` because the app's
+permission approval flow needs it. Warehouse and sample-table access use
+`USAGE` and `SELECT` without delegation.
+
 ### Setup
 
 Execute the shell script named `setup.sh` in the root folder:
