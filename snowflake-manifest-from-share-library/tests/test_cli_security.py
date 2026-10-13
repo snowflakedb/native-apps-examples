@@ -1,6 +1,7 @@
 """Check credential sourcing and error paths without contacting Snowflake."""
 
 from unittest.mock import Mock, patch
+import os
 import warnings
 
 import pytest
@@ -80,6 +81,7 @@ def test_key_auth_ignores_password_environment(monkeypatch):
 
 
 @pytest.mark.parametrize('mode', [0o644, 0o640, 0o604, 0o660, 0o666])
+@pytest.mark.skipif(os.name != 'posix', reason='POSIX mode bits do not describe Windows ACLs')
 def test_accessible_private_key_is_refused_before_parsing(tmp_path, mode):
     key = tmp_path / 'key.pem'
     key.write_text('dummy content')
