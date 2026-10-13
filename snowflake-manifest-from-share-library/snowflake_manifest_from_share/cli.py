@@ -7,10 +7,32 @@ import argparse
 import logging
 import sys
 import os
+import getpass
+import warnings
 from typing import Optional
 from .connection import SnowflakeConnection, _secure_read_private_key
 from .share_manifest_generator import ShareManifestGenerator
 from .yaml_formatter import YAMLFormatter
+
+
+class SecretSafeArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        # argparse otherwise echoes rejected arguments, including legacy secrets.
+        if message.startswith('unrecognized arguments:'):
+            message = 'unrecognized arguments; use --help for supported options'
+        super().error(message)
+
+
+def _resolve_secret(variable, prompt):
+    value = os.environ.get(variable)
+    if value is not None:
+        return value or None
+    if not sys.stdin.isatty():
+        return None
+    # Refuse getpass's fallback to an input stream that could echo the secret.
+    with warnings.catch_warnings():
+        warnings.simplefilter('error', getpass.GetPassWarning)
+        return getpass.getpass(prompt) or None
 
 
 def setup_logging(verbose: bool = False):
@@ -73,25 +95,26 @@ def get_connection_from_args(args) -> SnowflakeConnection:
 
 def main():
     """Main CLI entry point."""
-    parser = argparse.ArgumentParser(
+    parser = SecretSafeArgumentParser(
+        allow_abbrev=False,
         description='Create declarative application manifest from secure data share',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Examples:
+Examples (passwords are read from a prompt or SNOWFLAKE_PASSWORD):
   # Using account identifier
-  snowflake-manifest-from-share --account myaccount.region.cloud --user myuser --password mypass --share MYSHARE
+  snowflake-manifest-from-share --account myaccount.region.cloud --user myuser --share MYSHARE
 
   # Using host (copy-paste from Snowflake account details)
-  snowflake-manifest-from-share --host myaccount.region.cloud.snowflakecomputing.com --user myuser --password mypass --share MYSHARE
+  snowflake-manifest-from-share --host myaccount.region.cloud.snowflakecomputing.com --user myuser --share MYSHARE
 
   # Using full Snowflake URL
-  snowflake-manifest-from-share --account https://myaccount.snowflakecomputing.com --user myuser --password mypass --share MYSHARE
+  snowflake-manifest-from-share --account https://myaccount.snowflakecomputing.com --user myuser --share MYSHARE
 
   # Using private key authentication
   snowflake-manifest-from-share --host myaccount.region.cloud.snowflakecomputing.com --user myuser --private-key-path /path/to/key.pem --share MYSHARE
 
   # With custom output file and warehouse
-  snowflake-manifest-from-share --host myaccount.region.cloud.snowflakecomputing.com --user myuser --password mypass --share MYSHARE --output manifest.yml --warehouse COMPUTE_WH
+  snowflake-manifest-from-share --host myaccount.region.cloud.snowflakecomputing.com --user myuser --share MYSHARE --output manifest.yml --warehouse COMPUTE_WH
         """
     )
     
@@ -102,12 +125,8 @@ Examples:
                        help='Snowflake host (e.g., myaccount.region.cloud.snowflakecomputing.com)')
     parser.add_argument('--user', required=True,
                        help='Snowflake username')
-    parser.add_argument('--password',
-                       help='Snowflake password (if using password auth)')
     parser.add_argument('--private-key-path',
                        help='Path to private key file (if using key-pair auth)')
-    parser.add_argument('--private-key-passphrase',
-                       help='Passphrase for private key')
     parser.add_argument('--authenticator', default='snowflake',
                        help='Authentication method (default: snowflake)')
     parser.add_argument('--warehouse',
@@ -136,6 +155,17 @@ Examples:
                        help='Enable verbose logging')
     
     args = parser.parse_args()
+    try:
+        if args.private_key_path:
+            args.password = None
+            args.private_key_passphrase = _resolve_secret(
+                'SNOWFLAKE_PRIVATE_KEY_PASSPHRASE', 'Private key passphrase (empty if none): '
+            )
+        else:
+            args.private_key_passphrase = None
+            args.password = _resolve_secret('SNOWFLAKE_PASSWORD', 'Snowflake password: ')
+    except (getpass.GetPassWarning, EOFError):
+        parser.error('Cannot read a secret without terminal echo protection; use an environment variable')
     
     # Set up logging
     setup_logging(args.verbose)
@@ -143,7 +173,7 @@ Examples:
     
     # Validate authentication parameters
     if not args.password and not args.private_key_path:
-        logger.error("Must provide either --password or --private-key-path")
+        logger.error("Set SNOWFLAKE_PASSWORD, use the password prompt, or provide --private-key-path")
         sys.exit(1)
     
     try:

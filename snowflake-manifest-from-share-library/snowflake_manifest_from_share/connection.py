@@ -32,13 +32,11 @@ def _secure_read_private_key(private_key_path: str, passphrase: Optional[str] = 
     if not os.path.exists(private_key_path):
         raise FileNotFoundError(f"Private key file not found: {private_key_path}")
     
-    # Check file permissions (should not be world-readable)
-    file_stat = os.stat(private_key_path)
-    if file_stat.st_mode & 0o077:  # Check if group/other have any permissions
-        logger.warning(f"Private key file {private_key_path} has overly permissive permissions")
-    
     try:
         with open(private_key_path, 'rb') as f:
+            # Check the opened file so a path swap cannot bypass this check.
+            if os.fstat(f.fileno()).st_mode & 0o077:
+                raise PermissionError("Private key file must have permissions 0600 or stricter")
             key_content = f.read()
         
         if not key_content:
