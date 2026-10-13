@@ -98,3 +98,16 @@ def test_private_key_permission_check_uses_open_descriptor(tmp_path):
     parsed_key.private_bytes.return_value = b'dummy-der'
     with patch.object(connection.serialization, 'load_pem_private_key', return_value=parsed_key):
         assert connection._secure_read_private_key(str(key)) == b'dummy-der'
+
+
+def test_windows_key_files_do_not_use_posix_permission_bits(tmp_path):
+    key = tmp_path / 'key.pem'
+    key.write_text('dummy content')
+    key.chmod(0o644)
+    parsed_key = Mock()
+    parsed_key.private_bytes.return_value = b'dummy-der'
+    # Windows reports POSIX mode bits that do not describe its file ACLs.
+    with patch.object(connection.os, 'name', 'nt'), \
+            patch.object(connection.serialization, 'load_pem_private_key', return_value=parsed_key):
+        result = connection._secure_read_private_key(str(key))
+    assert result == b'dummy-der'

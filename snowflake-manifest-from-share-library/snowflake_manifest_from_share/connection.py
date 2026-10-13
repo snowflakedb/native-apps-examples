@@ -35,7 +35,7 @@ def _secure_read_private_key(private_key_path: str, passphrase: Optional[str] = 
     try:
         with open(private_key_path, 'rb') as f:
             # Check the opened file so a path swap cannot bypass this check.
-            if os.fstat(f.fileno()).st_mode & 0o077:
+            if os.name == 'posix' and os.fstat(f.fileno()).st_mode & 0o077:
                 raise PermissionError("Private key file must have permissions 0600 or stricter")
             key_content = f.read()
         

@@ -139,7 +139,7 @@ The structure includes:
 The library supports multiple authentication methods:
 
 1. **Password authentication**: Use the hidden password prompt, or set `SNOWFLAKE_PASSWORD` through your automation secret store.
-2. **Private key authentication**: Provide `--private-key-path`. Encrypted keys use a hidden prompt or `SNOWFLAKE_PRIVATE_KEY_PASSPHRASE`. Restrict key files to mode `0600` or stricter.
+2. **Private key authentication**: Provide `--private-key-path`. Encrypted keys use a hidden prompt or `SNOWFLAKE_PRIVATE_KEY_PASSPHRASE`. On POSIX systems, restrict key files to mode `0600` or stricter. On Windows, restrict access with file ACLs.
    - The key authentication path ignores `SNOWFLAKE_PASSWORD`. Press Enter at the passphrase prompt for an unencrypted key.
 
 ### Credential migration
