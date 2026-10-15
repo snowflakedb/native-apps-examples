@@ -59,6 +59,11 @@ app. Those last two privileges retain `WITH GRANT OPTION` because the app's
 permission approval flow needs it. Warehouse and sample-table access use
 `USAGE` and `SELECT` without delegation.
 
+Rerunning setup also removes the old provider account privileges and reduces
+access to the demo warehouse to `USAGE`. Consumer setup removes the old
+warehouse `USAGE` grant option and reduces sample-table access to `SELECT`.
+Only reuse these fixed roles for this example; the upgrade changes their privileges.
+
 ### Setup
 
 Execute the shell script named `setup.sh` in the root folder:

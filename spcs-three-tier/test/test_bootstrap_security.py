@@ -75,9 +75,11 @@ def test_provider_rejects_role_with_unexpected_members(account):
     for name in ['naspcs_role', 'owner']:
         cursor.execute('CREATE ROLE ' + names[name])
     cursor.execute('GRANT ROLE ' + names['naspcs_role'] + ' TO ROLE ' + names['owner'])
+    cursor.execute('GRANT CREATE INTEGRATION ON ACCOUNT TO ROLE ' + names['naspcs_role'])
     with pytest.raises(Exception, match='Demo roles must be owned'):
         run((ROOT / 'prepare/provider_setup.sql').read_text())
-    assert not cursor.execute('SHOW GRANTS TO ROLE ' + names['naspcs_role']).fetchall()
+    grants = cursor.execute('SHOW GRANTS TO ROLE ' + names['naspcs_role']).fetchall()
+    assert {grant[1] for grant in grants} == {'CREATE INTEGRATION'}
 
 
 def test_consumer_rejects_squatted_role(account):
@@ -98,3 +100,58 @@ def test_trusted_setup_can_be_repeated(account):
     assert 'CREATE APPLICATION PACKAGE' in privileges
     assert 'CREATE INTEGRATION' not in privileges
     assert 'CREATE COMPUTE POOL' not in privileges
+
+
+def role_grants(cursor, role):
+    cursor.execute('SHOW GRANTS TO ROLE ' + role)
+    columns = [column[0].lower() for column in cursor.description]
+    return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+
+def test_upgrade_removes_obsolete_demo_grants(account):
+    cursor, names, run = account
+    provider = (ROOT / 'prepare/provider_setup.sql').read_text()
+    consumer = (ROOT / 'prepare/consumer_setup.sql').read_text()
+    run(provider)
+    run(consumer)
+
+    # Reproduce every excess grant made by the original setup scripts.
+    obsolete = {
+        'CREATE INTEGRATION', 'CREATE COMPUTE POOL', 'CREATE WAREHOUSE',
+        'CREATE APPLICATION', 'BIND SERVICE ENDPOINT',
+    }
+    cursor.execute('USE ROLE ACCOUNTADMIN')
+    for privilege in sorted(obsolete):
+        cursor.execute(f'GRANT {privilege} ON ACCOUNT TO ROLE ' + names['naspcs_role'])
+    cursor.execute('GRANT ALL ON WAREHOUSE ' + names['wh_nap'] + ' TO ROLE ' + names['naspcs_role'])
+    cursor.execute('GRANT USAGE ON WAREHOUSE ' + names['wh_nac'] + ' TO ROLE ' + names['nac'] + ' WITH GRANT OPTION')
+    cursor.execute('GRANT ALL ON TABLE ' + names['snowflake_sample_data'] + '.tpch_sf10.orders TO ROLE ' + names['nac'])
+
+    prior = role_grants(cursor, names['naspcs_role'])
+    assert obsolete <= {grant['privilege'] for grant in prior}
+    assert any(grant['privilege'] == 'OPERATE' and grant['name'] == names['wh_nap'] for grant in prior)
+    prior_consumer = role_grants(cursor, names['nac'])
+    assert any(grant['name'] == names['wh_nac'] and grant['grant_option'] == 'true' for grant in prior_consumer)
+
+    # Keep an unrelated grant to prove the migration only changes demo grants.
+    cursor.execute('GRANT MONITOR USAGE ON ACCOUNT TO ROLE ' + names['naspcs_role'])
+    run(provider)
+    run(consumer)
+    run(provider)
+    run(consumer)
+
+    provider_grants = role_grants(cursor, names['naspcs_role'])
+    account_privileges = {grant['privilege'] for grant in provider_grants if grant['granted_on'] == 'ACCOUNT'}
+    assert account_privileges == {'CREATE DATABASE', 'CREATE APPLICATION PACKAGE', 'MONITOR USAGE'}
+    warehouse_grants = [grant for grant in provider_grants if grant['name'] == names['wh_nap']]
+    assert {grant['privilege'] for grant in warehouse_grants} == {'USAGE'}
+    assert all(grant['grant_option'] == 'false' for grant in warehouse_grants)
+
+    consumer_grants = role_grants(cursor, names['nac'])
+    warehouse_grants = [grant for grant in consumer_grants if grant['name'] == names['wh_nac']]
+    assert {grant['privilege'] for grant in warehouse_grants} == {'USAGE'}
+    assert all(grant['grant_option'] == 'false' for grant in warehouse_grants)
+    table_grants = [grant for grant in consumer_grants if grant['name'] == names['snowflake_sample_data'] + '.TPCH_SF10.ORDERS']
+    assert {grant['privilege'] for grant in table_grants} == {'SELECT'}
+    for privilege in ['CREATE COMPUTE POOL', 'BIND SERVICE ENDPOINT']:
+        assert any(grant['privilege'] == privilege and grant['grant_option'] == 'true' for grant in consumer_grants)

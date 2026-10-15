@@ -27,6 +27,7 @@ BEGIN
 
     CREATE DATABASE IF NOT EXISTS snowflake_sample_data;
     CREATE SCHEMA IF NOT EXISTS snowflake_sample_data.tpch_sf10;
+    REVOKE GRANT OPTION FOR USAGE ON WAREHOUSE wh_nac FROM ROLE nac;
     GRANT USAGE ON WAREHOUSE wh_nac TO ROLE nac;
     GRANT USAGE ON DATABASE snowflake_sample_data TO ROLE nac;
     GRANT USAGE ON SCHEMA snowflake_sample_data.tpch_sf10 TO ROLE nac;
@@ -60,6 +61,7 @@ BEGIN
     (32225184,2546588,'F',299433.02,'1992-01-09','1-URGENT','Clerk#000004466',0,'l packages wake slyly: fluffily regular packages boost along the ironic foxes.'),
     (32988261,11935817,'F',388914.37,'1992-01-10','4-NOT SPECIFIED','Clerk#000043048',0,'sits according to the quickly final deposits ');
 
+    REVOKE ALL PRIVILEGES ON TABLE snowflake_sample_data.tpch_sf10.orders FROM ROLE nac;
     GRANT SELECT ON TABLE snowflake_sample_data.tpch_sf10.orders TO ROLE nac;
 
     USE ROLE nac;

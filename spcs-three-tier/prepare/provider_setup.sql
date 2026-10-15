@@ -30,10 +30,18 @@ BEGIN
         RAISE untrusted_role;
     END IF;
 
+    -- Remove obsolete demo grants when upgrading an existing trusted setup.
+    REVOKE CREATE INTEGRATION ON ACCOUNT FROM ROLE naspcs_role;
+    REVOKE CREATE COMPUTE POOL ON ACCOUNT FROM ROLE naspcs_role;
+    REVOKE CREATE WAREHOUSE ON ACCOUNT FROM ROLE naspcs_role;
+    REVOKE CREATE APPLICATION ON ACCOUNT FROM ROLE naspcs_role;
+    REVOKE BIND SERVICE ENDPOINT ON ACCOUNT FROM ROLE naspcs_role;
+
     GRANT ROLE naspcs_role TO ROLE accountadmin;
     GRANT CREATE DATABASE ON ACCOUNT TO ROLE naspcs_role;
     GRANT CREATE APPLICATION PACKAGE ON ACCOUNT TO ROLE naspcs_role;
     CREATE WAREHOUSE IF NOT EXISTS wh_nap WITH WAREHOUSE_SIZE='XSMALL';
+    REVOKE ALL PRIVILEGES ON WAREHOUSE wh_nap FROM ROLE naspcs_role;
     GRANT USAGE ON WAREHOUSE wh_nap TO ROLE naspcs_role;
 
     USE ROLE naspcs_role;
