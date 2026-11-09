@@ -27,8 +27,8 @@ BEGIN
 
     CREATE DATABASE IF NOT EXISTS snowflake_sample_data;
     CREATE SCHEMA IF NOT EXISTS snowflake_sample_data.tpch_sf10;
-    REVOKE GRANT OPTION FOR USAGE ON WAREHOUSE wh_nac FROM ROLE nac;
-    GRANT USAGE ON WAREHOUSE wh_nac TO ROLE nac;
+    -- Deployment delegates warehouse access to the application in register_callback.sql.
+    GRANT USAGE ON WAREHOUSE wh_nac TO ROLE nac WITH GRANT OPTION;
     GRANT USAGE ON DATABASE snowflake_sample_data TO ROLE nac;
     GRANT USAGE ON SCHEMA snowflake_sample_data.tpch_sf10 TO ROLE nac;
     GRANT CREATE DATABASE ON ACCOUNT TO ROLE nac;

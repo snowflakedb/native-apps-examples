@@ -38,6 +38,7 @@ def account():
             cursor.execute(statement[0])
     try:
         cursor.execute('USE ROLE ACCOUNTADMIN')
+        cursor.execute('USE SECONDARY ROLES NONE')
         yield cursor, names, run
     finally:
         cursor.execute('USE ROLE ACCOUNTADMIN')
@@ -100,6 +101,20 @@ def test_trusted_setup_can_be_repeated(account):
     assert 'CREATE APPLICATION PACKAGE' in privileges
     assert 'CREATE INTEGRATION' not in privileges
     assert 'CREATE COMPUTE POOL' not in privileges
+    assert_consumer_can_delegate_warehouse(cursor, names)
+
+
+def assert_consumer_can_delegate_warehouse(cursor, names):
+    cursor.execute('USE ROLE ACCOUNTADMIN')
+    cursor.execute('CREATE ROLE ' + names['owner'])
+    cursor.execute('USE ROLE ' + names['nac'])
+    # Test the deployment grant without help from ACCOUNTADMIN secondary roles.
+    cursor.execute('USE SECONDARY ROLES NONE')
+    cursor.execute('GRANT USAGE ON WAREHOUSE ' + names['wh_nac'] + ' TO ROLE ' + names['owner'])
+    cursor.execute('USE ROLE ACCOUNTADMIN')
+    grants = role_grants(cursor, names['owner'])
+    assert any(grant['privilege'] == 'USAGE' and grant['name'] == names['wh_nac']
+               and grant['granted_by'] == names['nac'] for grant in grants)
 
 
 def role_grants(cursor, role):
@@ -150,8 +165,9 @@ def test_upgrade_removes_obsolete_demo_grants(account):
     consumer_grants = role_grants(cursor, names['nac'])
     warehouse_grants = [grant for grant in consumer_grants if grant['name'] == names['wh_nac']]
     assert {grant['privilege'] for grant in warehouse_grants} == {'USAGE'}
-    assert all(grant['grant_option'] == 'false' for grant in warehouse_grants)
+    assert all(grant['grant_option'] == 'true' for grant in warehouse_grants)
     table_grants = [grant for grant in consumer_grants if grant['name'] == names['snowflake_sample_data'] + '.TPCH_SF10.ORDERS']
     assert {grant['privilege'] for grant in table_grants} == {'SELECT'}
     for privilege in ['CREATE COMPUTE POOL', 'BIND SERVICE ENDPOINT']:
         assert any(grant['privilege'] == privilege and grant['grant_option'] == 'true' for grant in consumer_grants)
+    assert_consumer_can_delegate_warehouse(cursor, names)

@@ -56,12 +56,13 @@ The provider role can create the example database and application package.
 The consumer role can install the app, create its sample database and external
 access integration, and approve compute pool and endpoint privileges for the
 app. Those last two privileges retain `WITH GRANT OPTION` because the app's
-permission approval flow needs it. Warehouse and sample-table access use
-`USAGE` and `SELECT` without delegation.
+permission approval flow needs it. Consumer warehouse `USAGE` also retains
+`WITH GRANT OPTION` so deployment can grant access to the application.
+Provider warehouse `USAGE` and sample-table `SELECT` do not need delegation.
 
 Rerunning setup also removes the old provider account privileges and reduces
-access to the demo warehouse to `USAGE`. Consumer setup removes the old
-warehouse `USAGE` grant option and reduces sample-table access to `SELECT`.
+access to the demo warehouse to `USAGE`. Consumer setup reduces sample-table
+access to `SELECT` and preserves warehouse delegation needed by deployment.
 Only reuse these fixed roles for this example; the upgrade changes their privileges.
 
 ### Setup
