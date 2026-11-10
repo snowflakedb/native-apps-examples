@@ -31,25 +31,25 @@ pip3 install -e .
 
 ```bash
 # Using account identifier
-snowflake-manifest-from-share --account myaccount.region.cloud --user myuser --password mypass --share MYSHARE
+snowflake-manifest-from-share --account myaccount.region.cloud --user myuser --share MYSHARE
 
 # Using host (copy-paste from Snowflake account details)
-snowflake-manifest-from-share --host myaccount.region.cloud.snowflakecomputing.com --user myuser --password mypass --share MYSHARE
+snowflake-manifest-from-share --host myaccount.region.cloud.snowflakecomputing.com --user myuser --share MYSHARE
 
 # Using full Snowflake URL
-snowflake-manifest-from-share --account https://myaccount.snowflakecomputing.com --user myuser --password mypass --share MYSHARE
+snowflake-manifest-from-share --account https://myaccount.snowflakecomputing.com --user myuser --share MYSHARE
 
 # Using private key authentication
 snowflake-manifest-from-share --host myaccount.region.cloud.snowflakecomputing.com --user myuser --private-key-path /path/to/key.pem --share MYSHARE
 
-# Using private key authentication with passphrase (passphrase must be in double quotes)
-snowflake-manifest-from-share --host myaccount.region.cloud.snowflakecomputing.com --user myuser --private-key-path /path/to/key.pem --private-key-passphrase "your_passphrase" --share MYSHARE
+# Using an encrypted private key (passphrase read from a prompt or environment)
+snowflake-manifest-from-share --host myaccount.region.cloud.snowflakecomputing.com --user myuser --private-key-path /path/to/key.pem --share MYSHARE
 
 # Save output to file
-snowflake-manifest-from-share --host myaccount.region.cloud.snowflakecomputing.com --user myuser --password mypass --share MYSHARE --output manifest.yml
+snowflake-manifest-from-share --host myaccount.region.cloud.snowflakecomputing.com --user myuser --share MYSHARE --output manifest.yml
 
 # With additional connection parameters
-snowflake-manifest-from-share --host myaccount.region.cloud.snowflakecomputing.com --user myuser --password mypass --share MYSHARE --warehouse COMPUTE_WH --role ANALYST_ROLE
+snowflake-manifest-from-share --host myaccount.region.cloud.snowflakecomputing.com --user myuser --share MYSHARE --warehouse COMPUTE_WH --role ANALYST_ROLE
 ```
 
 ### Python API
@@ -138,9 +138,19 @@ The structure includes:
 
 The library supports multiple authentication methods:
 
-1. **Password authentication**: Provide `--password`
-2. **Private key authentication**: Provide `--private-key-path` (and optionally `--private-key-passphrase` for encrypted keys)
-   - **Note**: When using `--private-key-passphrase`, the passphrase must be enclosed in double quotes
+1. **Password authentication**: Use the hidden password prompt, or set `SNOWFLAKE_PASSWORD` through your automation secret store.
+2. **Private key authentication**: Provide `--private-key-path`. Encrypted keys use a hidden prompt or `SNOWFLAKE_PRIVATE_KEY_PASSPHRASE`. On POSIX systems, restrict key files to mode `0600` or stricter. On Windows, restrict access with file ACLs.
+   - The key authentication path ignores `SNOWFLAKE_PASSWORD`. Press Enter at the passphrase prompt for an unencrypted key.
+
+### Credential migration
+
+The `--password` and `--private-key-passphrase` options have been removed.
+Command-line secrets are visible in process listings and may enter shell history.
+Use the hidden prompts for interactive runs. For automation, inject
+`SNOWFLAKE_PASSWORD` or `SNOWFLAKE_PRIVATE_KEY_PASSPHRASE` from a secret store;
+do not write literal secrets into shell commands. Environment variables remain
+accessible to the same operating-system user and privileged processes.
+Non-interactive runs never prompt. A missing password fails before connecting.
 
 ## Development
 

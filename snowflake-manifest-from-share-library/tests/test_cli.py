@@ -173,7 +173,6 @@ class TestCLI:
             'snowflake-manifest-from-share',
             '--account', 'myaccount',
             '--user', 'testuser',
-            '--password', 'testpass',
             '--share', 'TEST_SHARE'
         ]
 
@@ -194,7 +193,7 @@ class TestCLI:
         # Capture stdout
         captured_output = io.StringIO()
         
-        with patch.object(sys, 'argv', test_args):
+        with patch.dict('os.environ', {'SNOWFLAKE_PASSWORD': 'testpass'}), patch.object(sys, 'argv', test_args):
             with patch('sys.stdout', captured_output):
                 with patch('sys.exit'):
                     main()
@@ -218,7 +217,6 @@ class TestCLI:
             'snowflake-manifest-from-share',
             '--account', 'myaccount',
             '--user', 'testuser',
-            '--password', 'testpass',
             '--share', 'TEST_SHARE',
             '--output', 'manifest.yml'
         ]
@@ -235,7 +233,7 @@ class TestCLI:
         test_result = {'manifest_version': 2, 'test': 'data'}
         mock_generator.analyze_share.return_value = test_result
 
-        with patch.object(sys, 'argv', test_args):
+        with patch.dict('os.environ', {'SNOWFLAKE_PASSWORD': 'testpass'}), patch.object(sys, 'argv', test_args):
             with patch('sys.exit'):
                 main()
 
@@ -264,7 +262,6 @@ class TestCLI:
             'snowflake-manifest-from-share',
             '--account', 'myaccount',
             '--user', 'testuser',
-            '--password', 'testpass',
             '--share', 'TEST_SHARE'
         ]
 
@@ -276,7 +273,7 @@ class TestCLI:
         # Mock connection error
         mock_generator.analyze_share.side_effect = Exception("Connection failed")
 
-        with patch.object(sys, 'argv', test_args):
+        with patch.dict('os.environ', {'SNOWFLAKE_PASSWORD': 'testpass'}), patch.object(sys, 'argv', test_args):
             with pytest.raises(SystemExit):
                 main()
 
@@ -286,11 +283,10 @@ class TestCLI:
             'snowflake-manifest-from-share',
             '--account', 'myaccount',
             '--user', 'testuser',
-            '--password', 'testpass',
             '--share', 'TEST_SHARE'
         ]
 
         with patch('snowflake_manifest_from_share.cli.get_connection_from_args', side_effect=KeyboardInterrupt()):
-            with patch.object(sys, 'argv', test_args):
+            with patch.dict('os.environ', {'SNOWFLAKE_PASSWORD': 'testpass'}), patch.object(sys, 'argv', test_args):
                 with pytest.raises(SystemExit):
                     main()
