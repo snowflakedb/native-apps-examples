@@ -1,32 +1,63 @@
 USE ROLE ACCOUNTADMIN;
-CREATE ROLE IF NOT EXISTS naspcs_role;
+-- Abort the whole bootstrap before any privilege grant if a role is untrusted.
+EXECUTE IMMEDIATE $$
+DECLARE
+    trusted_roles INTEGER;
+    unexpected_grants INTEGER;
+    untrusted_role EXCEPTION (-20001, 'Demo roles must be owned by ACCOUNTADMIN and granted only to ACCOUNTADMIN. Review existing roles before setup.');
+BEGIN
+    CREATE ROLE IF NOT EXISTS naspcs_role;
+    CREATE ROLE IF NOT EXISTS nac;
+    SHOW ROLES;
+    SELECT COUNT(*) INTO :trusted_roles
+        FROM TABLE(RESULT_SCAN(LAST_QUERY_ID()))
+        WHERE "name" IN ('NASPCS_ROLE', 'NAC') AND "owner" = 'ACCOUNTADMIN';
+    IF (trusted_roles != 2) THEN
+        RAISE untrusted_role;
+    END IF;
+    SHOW GRANTS OF ROLE naspcs_role;
+    SELECT COUNT(*) INTO :unexpected_grants
+        FROM TABLE(RESULT_SCAN(LAST_QUERY_ID()))
+        WHERE "granted_to" != 'ROLE' OR "grantee_name" != 'ACCOUNTADMIN';
+    IF (unexpected_grants != 0) THEN
+        RAISE untrusted_role;
+    END IF;
+    SHOW GRANTS OF ROLE nac;
+    SELECT COUNT(*) INTO :unexpected_grants
+        FROM TABLE(RESULT_SCAN(LAST_QUERY_ID()))
+        WHERE "granted_to" != 'ROLE' OR "grantee_name" != 'ACCOUNTADMIN';
+    IF (unexpected_grants != 0) THEN
+        RAISE untrusted_role;
+    END IF;
 
-GRANT ROLE naspcs_role TO ROLE accountadmin;
-GRANT CREATE INTEGRATION ON ACCOUNT TO ROLE naspcs_role;
-GRANT CREATE COMPUTE POOL ON ACCOUNT TO ROLE naspcs_role;
-GRANT CREATE WAREHOUSE ON ACCOUNT TO ROLE naspcs_role;
-GRANT CREATE DATABASE ON ACCOUNT TO ROLE naspcs_role;
-GRANT CREATE APPLICATION PACKAGE ON ACCOUNT TO ROLE naspcs_role;
-GRANT CREATE APPLICATION ON ACCOUNT TO ROLE naspcs_role;
-GRANT BIND SERVICE ENDPOINT ON ACCOUNT TO ROLE naspcs_role;
-CREATE WAREHOUSE IF NOT EXISTS wh_nap WITH WAREHOUSE_SIZE='XSMALL';
-GRANT ALL ON WAREHOUSE wh_nap TO ROLE naspcs_role;
+    -- Remove obsolete demo grants when upgrading an existing trusted setup.
+    REVOKE CREATE INTEGRATION ON ACCOUNT FROM ROLE naspcs_role;
+    REVOKE CREATE COMPUTE POOL ON ACCOUNT FROM ROLE naspcs_role;
+    REVOKE CREATE WAREHOUSE ON ACCOUNT FROM ROLE naspcs_role;
+    REVOKE CREATE APPLICATION ON ACCOUNT FROM ROLE naspcs_role;
+    REVOKE BIND SERVICE ENDPOINT ON ACCOUNT FROM ROLE naspcs_role;
 
-USE ROLE naspcs_role;
-CREATE DATABASE IF NOT EXISTS spcs_app;
-CREATE SCHEMA IF NOT EXISTS spcs_app.napp;
+    GRANT ROLE naspcs_role TO ROLE accountadmin;
+    GRANT CREATE DATABASE ON ACCOUNT TO ROLE naspcs_role;
+    GRANT CREATE APPLICATION PACKAGE ON ACCOUNT TO ROLE naspcs_role;
+    CREATE WAREHOUSE IF NOT EXISTS wh_nap WITH WAREHOUSE_SIZE='XSMALL';
+    REVOKE ALL PRIVILEGES ON WAREHOUSE wh_nap FROM ROLE naspcs_role;
+    GRANT USAGE ON WAREHOUSE wh_nap TO ROLE naspcs_role;
 
--- For Provider-side Testing
-USE ROLE ACCOUNTADMIN;
-CREATE ROLE IF NOT EXISTS nac;
-GRANT CREATE APPLICATION ON ACCOUNT TO ROLE nac;
-GRANT CREATE INTEGRATION ON ACCOUNT TO ROLE nac;
+    USE ROLE naspcs_role;
+    CREATE DATABASE IF NOT EXISTS spcs_app;
+    CREATE SCHEMA IF NOT EXISTS spcs_app.napp;
 
--- Create the Image Repository
-USE ROLE naspcs_role;
-CREATE IMAGE REPOSITORY IF NOT EXISTS spcs_app.napp.img_repo;
-GRANT USAGE ON DATABASE spcs_app TO ROLE nac;
-GRANT USAGE ON SCHEMA spcs_app.napp TO ROLE nac;
-GRANT READ ON IMAGE REPOSITORY spcs_app.napp.img_repo TO ROLE nac;
+    -- For Provider-side Testing
+    USE ROLE ACCOUNTADMIN;
+    GRANT CREATE APPLICATION ON ACCOUNT TO ROLE nac;
+    GRANT CREATE INTEGRATION ON ACCOUNT TO ROLE nac;
 
-
+    -- Create the Image Repository
+    USE ROLE naspcs_role;
+    CREATE IMAGE REPOSITORY IF NOT EXISTS spcs_app.napp.img_repo;
+    GRANT USAGE ON DATABASE spcs_app TO ROLE nac;
+    GRANT USAGE ON SCHEMA spcs_app.napp TO ROLE nac;
+    GRANT READ ON IMAGE REPOSITORY spcs_app.napp.img_repo TO ROLE nac;
+END;
+$$;
