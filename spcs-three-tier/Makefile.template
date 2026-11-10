@@ -6,7 +6,7 @@ ROUTER_IMAGE=eap_router
 help:            ## Show this help.
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 
-all: login build push
+all: push
 
 login:           ## Login to Snowflake Docker repo
 	snow spcs image-registry login
@@ -24,14 +24,14 @@ build_router:    ## Build Docker image for router for Snowpark Container Service
 
 push: push_backend push_frontend push_router     ## Push Docker images to Snowpark Container Services
 
-push_backend:    ## Push backend Docker image to Snowpark Container Services
+push_backend: login build_backend    ## Push backend Docker image to Snowpark Container Services
 	docker tag $(BACKEND_IMAGE) $(SNOWFLAKE_REPO)/$(BACKEND_IMAGE)
 	docker push $(SNOWFLAKE_REPO)/$(BACKEND_IMAGE)
 
-push_frontend:   ## Push frontend Docker image to Snowpark Container Services
+push_frontend: login build_frontend   ## Push frontend Docker image to Snowpark Container Services
 	docker tag $(FRONTEND_IMAGE) $(SNOWFLAKE_REPO)/$(FRONTEND_IMAGE)
 	docker push $(SNOWFLAKE_REPO)/$(FRONTEND_IMAGE)
 
-push_router:     ## Push router Docker image to Snowpark Container Services
+push_router: login build_router     ## Push router Docker image to Snowpark Container Services
 	docker tag $(ROUTER_IMAGE) $(SNOWFLAKE_REPO)/$(ROUTER_IMAGE)
 	docker push $(SNOWFLAKE_REPO)/$(ROUTER_IMAGE)

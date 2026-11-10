@@ -1,0 +1,28 @@
+name: Verify SPCS backend
+
+on:
+  pull_request:
+    paths:
+      - 'spcs-three-tier/backend/**'
+      - 'spcs-three-tier/scripts/render_image_specs.py'
+      - 'spcs-three-tier/test/**'
+      - 'spcs-three-tier/*.template'
+      - 'spcs-three-tier/setup.sh'
+      - '.github/workflows/spcs-backend.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: python -m pip install pytest pyyaml
+      - run: docker build --platform linux/amd64 -t spcs-backend:test spcs-three-tier/backend
+      - run: pytest spcs-three-tier/test
+        env:
+          NATIVE_APPS_BACKEND_IMAGE: spcs-backend:test
