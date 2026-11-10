@@ -1,42 +1,36 @@
-import streamlit as st
-import pandas as pd
-from snowflake.snowpark.context import get_active_session
+def update_table(session, input_column, result_column):
+    """Pass consumer column names as values to the enrichment procedure."""
+    return session.sql(
+        "CALL ENRICHIP.enrich_ip_data(?, ?)",
+        params=[input_column, result_column],
+    ).collect()
 
-# get the active session
-session = get_active_session()
-# define the things that need mapping
-lstMappingItems =  ["IP ADDRESS COLUMN", "RESULT COLUMN"]
-# from our consumer table return a list of all the columns
-option_source = session.sql("SELECT * FROM REFERENCE('tabletouse') WHERE 1=0").to_pandas().columns.values.tolist()
-# create a dictionary to hold the mappings
-to_be_mapped= dict()
-#create a form to do the mapping visualisation
-with st.form("mapping_form"):
-    header = st.columns([1])
-    #give it a title
-    header[0].subheader('Define Mappings')
-    # for each mapping requirement add a selectbox
-    # populate the choices with the column list from the consumer table
-    for i in range(len(lstMappingItems)):
-        row = st.columns([1])
-        selected_col = row[0].selectbox(label = f'Choose Mapping for {lstMappingItems[i]}',options = option_source)
-        # add the mappings to the dictionary
-        to_be_mapped[lstMappingItems[i]] = selected_col
-        
-    row = st.columns(2)
-    # submit the mappings
-    submit = row[1].form_submit_button('Update Mappings')
 
-# not necessary but useful to see what the mappings look like
-st.json(to_be_mapped)
+def render(session):
+    import streamlit as st
 
-#function call the stored procedure in the application that does the reading and writing
-def update_table():
-    # build the statement
-    statement = ' CALL ENRICHIP.enrich_ip_data(\'' + to_be_mapped["IP ADDRESS COLUMN"] + '\',\'' +  to_be_mapped["RESULT COLUMN"] + '\')'
-    #execute the statement
-    session.sql(statement).collect()
-    #again not necessary but useful for debugging (would the statement work in a worksheet)
-    st.write(statement)
-#update the consumer table
-st.button('UPDATE!', on_click=update_table)
+    columns = session.sql(
+        "SELECT * FROM REFERENCE('tabletouse') WHERE 1=0"
+    ).to_pandas().columns.values.tolist()
+    if not columns:
+        st.info("Choose a table with columns to enrich.")
+        return
+
+    with st.form("mapping_form"):
+        st.subheader("Define Mappings")
+        input_column = st.selectbox("IP ADDRESS COLUMN", options=columns)
+        result_column = st.selectbox("RESULT COLUMN", options=columns)
+        st.form_submit_button("Update Mappings")
+
+    st.json({"IP ADDRESS COLUMN": input_column, "RESULT COLUMN": result_column})
+    st.button(
+        "UPDATE!",
+        on_click=update_table,
+        args=(session, input_column, result_column),
+    )
+
+
+if __name__ == "__main__":
+    from snowflake.snowpark.context import get_active_session
+
+    render(get_active_session())
