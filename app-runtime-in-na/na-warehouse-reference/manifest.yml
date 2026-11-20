@@ -1,0 +1,45 @@
+manifest_version: 2
+
+version:
+  name: V1
+  label: "Warehouse Whisperer 1.0"
+  comment: "Initial Marketplace release"
+
+artifacts:
+  setup_script: setup.sql
+  readme: README.md
+  snowflake_apps:
+    - name: warehouse_whisperer
+      artifact_repository: WAREHOUSE_WHISPERER_PROVIDER.PUBLIC.WAREHOUSE_WHISPERER_REPO
+      package: WAREHOUSE_WHISPERER
+      version: VERSION$1
+  default_web_endpoint:
+    application_service: app_public.warehouse_whisperer
+
+privileges:
+  - BIND SERVICE ENDPOINT:
+      description: "Expose the Warehouse Whisperer web interface."
+  - IMPORTED PRIVILEGES ON SNOWFLAKE DB:
+      description: "Read account query history from SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY."
+
+snowflake_database:
+  roles:
+    - cortex_user:
+        description: "Use Cortex AI to generate and summarize query-history analysis."
+
+restricted_callers_rights:
+  enabled: true
+  description: "Run warehouse and query diagnostics using only caller privileges explicitly granted by the consumer."
+
+references:
+  - query_warehouse:
+      label: "Query warehouse"
+      description: "Warehouse used to run Cortex AI and query-history analysis."
+      privileges:
+        - USAGE
+      object_type: WAREHOUSE
+      multi_valued: false
+      register_callback: app_callbacks.register_single_reference
+
+lifecycle_callbacks:
+  version_initializer: app_callbacks.version_init

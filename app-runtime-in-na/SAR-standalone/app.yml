@@ -1,0 +1,36 @@
+# created-by: snowflake-apps-create; template=nextjs-template; skill-version=1.0.0
+version: 2
+runtime: node
+
+name: WAREHOUSE_WHISPERER
+database: WAREHOUSE_WHISPERER_PROVIDER
+schema: PUBLIC
+query_warehouse: WAREHOUSE_WHISPERER_BUILD_WH
+compute_resource: SERVERLESS
+
+label: "Warehouse Whisperer"
+description: "An AI analyst for investigating Snowflake warehouse and query activity."
+icon: "public/icon.svg"
+
+ignore:
+  - node_modules
+  - .env*
+  - __pycache__
+  - "*.pyc"
+  - .next
+  - .git
+  - snowflake.log
+
+install:
+  commands:
+    - ["npm", "ci", "--include=dev"]
+
+build:
+  commands:
+    - ["npm", "run", "build"]
+    - ["cp", "-r", ".next/static", ".next/standalone/.next/static"]
+    - ["cp", "-r", "public", ".next/standalone/public"]
+    - ["rm", "-rf", "node_modules"]
+
+run:
+  command: ["node", ".next/standalone/server.js"]
