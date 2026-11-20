@@ -1,0 +1,25 @@
+definition_version: 2
+
+entities:
+  warehouse_whisperer_na_managed_package:
+    type: application package
+    identifier: WAREHOUSE_WHISPERER_NA_MANAGED_PACKAGE
+    manifest: manifest.yml
+    stage: stage_content.app_code
+    artifacts:
+      - src: manifest.yml
+        dest: ./
+      - src: setup.sql
+        dest: ./
+      - src: README.md
+        dest: README.md
+    meta:
+      role: ACCOUNTADMIN
+
+  warehouse_whisperer_na_managed:
+    type: application
+    identifier: WAREHOUSE_WHISPERER_NA_MANAGED
+    from:
+      target: warehouse_whisperer_na_managed_package
+    meta:
+      role: ACCOUNTADMIN

@@ -1,0 +1,176 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* dark: utilities follow the .dark class set by components/theme-provider.tsx */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * THEMING
+ * -------
+ * Every color is a CSS variable: light values in :root, dark overrides in .dark.
+ * These are a neutral starting point, not a house style. Replace them with the
+ * app's own palette (both blocks); components, focus rings and charts follow.
+ * Use tokens (bg-card, text-muted-foreground, border, bg-chart-2...) rather than
+ * hard-coded colors so dark mode keeps working.
+ */
+
+@layer base {
+  :root {
+    /* Accent used by the welcome page and the first chart series. */
+    --brand: #2eb67d;
+
+    --background: #f3efe3;
+    --foreground: #17241d;
+    --card: #fffdf6;
+    --card-foreground: #17241d;
+    --popover: #ffffff;
+    --popover-foreground: #1e222a;
+
+    --primary: #177550;
+    --primary-foreground: #ffffff;
+    --secondary: #e5dfd0;
+    --secondary-foreground: #17241d;
+    --muted: #ebe5d7;
+    --muted-foreground: #59675f;
+    --accent: #dfe8df;
+    --accent-foreground: #17241d;
+    --destructive: #a83832;
+    --destructive-foreground: #ffffff;
+    --border: #cec7b6;
+    --input: #bdb5a3;
+    --ring: #177550;
+    --radius: 0.5rem;
+
+    --success: #13804b;
+    --warning: #b25e09;
+
+    /* Chart series stay distinct from each other in both modes. */
+    --chart-1: var(--brand);
+    --chart-2: #5b5fd6;
+    --chart-3: #e0951c;
+    --chart-4: #1f9d6b;
+    --chart-5: #d9486f;
+    --chart-grid: #eceef2;
+    --chart-axis: #6b7280;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-brand: var(--brand);
+  /* System font stacks by default; each app picks its own fonts (README, Designing the app). */
+  --font-sans: Avenir, 'Avenir Next', 'Gill Sans', sans-serif;
+  --font-display: Georgia, 'Times New Roman', serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  .dark {
+    --background: #0c1410;
+    --foreground: #edf4ee;
+    --card: #121e17;
+    --card-foreground: #edf4ee;
+    --popover: #17251c;
+    --popover-foreground: #edf4ee;
+    --primary: #53d596;
+    --primary-foreground: #08110c;
+    --secondary: #1a2a20;
+    --secondary-foreground: #edf4ee;
+    --muted: #17231b;
+    --muted-foreground: #a2b1a6;
+    --accent: #203128;
+    --accent-foreground: #edf4ee;
+    --destructive: #ff8078;
+    --destructive-foreground: #0c1410;
+    --border: #2b3d31;
+    --input: #395040;
+    --ring: #53d596;
+    --success: #3fc285;
+    --warning: #f0a83c;
+    --chart-2: #8b8ff0;
+    --chart-3: #f2b04a;
+    --chart-4: #45c493;
+    --chart-5: #f07a99;
+    --chart-grid: #23272f;
+    --chart-axis: #8d94a1;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: 'ss01', 'cv11';
+    -webkit-font-smoothing: antialiased;
+  }
+  .query-grid {
+    background-image:
+      linear-gradient(to right, color-mix(in srgb, var(--border) 42%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, var(--border) 42%, transparent) 1px, transparent 1px),
+      radial-gradient(circle at 50% 15%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 55%);
+    background-size: 46px 46px, 46px 46px, 100% 100%;
+  }
+  .font-display { font-family: var(--font-display); }
+  .analysis-pulse { animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .25; transform: scale(.72); } }
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* Motion: sections rise in once; bars grow from their baseline. Off under reduced motion. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+@utility animate-rise {
+  animation: rise 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@utility animate-grow-x {
+  animation: grow-x 800ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  transform-origin: left;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise,
+  .animate-grow-x {
+    animation: none;
+  }
+}

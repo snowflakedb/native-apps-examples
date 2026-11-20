@@ -1,0 +1,15 @@
+node_modules/
+.next/
+out/
+output/
+*.tsbuildinfo
+.env.local
+*.log
+.DS_Store
+
+# Keep the committed lockfile even under a parent .gitignore that ignores lockfiles
+# (for example a pnpm monorepo). Installs need this frozen tree: without it, npm
+# re-resolves caret ranges against the live registry on every install, and the
+# runtime image's npm 10.9.x can crash building the peer set from scratch
+# ("Cannot read properties of null (reading 'edgesOut')").
+!package-lock.json
