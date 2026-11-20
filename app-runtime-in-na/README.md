@@ -1,4 +1,4 @@
-# Warehouse Whisperer: Snowflake App Runtime in Native Apps
+# Snowflake App Runtime in Native Apps
 
 Warehouse Whisperer is a Next.js chat application that uses Cortex AI to answer questions about `SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY`. This example demonstrates how to build the application once with Snowflake App Runtime (SAR), publish its artifact, and package that same artifact in two Snowflake Native App architectures.
 
